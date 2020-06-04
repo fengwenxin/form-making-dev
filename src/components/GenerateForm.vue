@@ -253,7 +253,7 @@ export default {
           this.allInputsmark.push(true)
         }
     },
-    // 光标操作控制流程 
+    // 光标操作控制流程
     handelFocus() {
       for(let i=this.focusIndex;i<this.allInputsmark.length;i++){
         if(this.allInputsmark[i]){
