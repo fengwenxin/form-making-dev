@@ -231,6 +231,7 @@ export default {
         } else if (this.haveHide && !eval(activedata.hidden)) {
           activedata.options.hidden=false;
           this.allInputsmark[activeIndex] = true;
+
         }
       }
     },
