@@ -16,10 +16,6 @@ request.interceptors.request.use(
 
 request.interceptors.response.use(
   response => {
-<<<<<<< HEAD
-=======
-    console.log('.....', response)
->>>>>>> 65e2240164023ddc2fda7c53f97948ab8e096da8
     return response.data
   },
   error => {
