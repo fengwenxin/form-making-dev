@@ -23,7 +23,8 @@ export const basicComponents = [
       dataType: 'string',
       pattern: '',
       placeholder: '',
-      disabled: false
+      disabled: false,
+      tips:"暂无提示信息"
     }
   },
   {

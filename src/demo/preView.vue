@@ -1,11 +1,15 @@
 <template>
   <div class="render-wrap">
-    <render-form v-if="configdata!=null" :configdata="configdata" ref="renderForm"></render-form>
+    <render-form
+      v-if="configdata != null"
+      :configdata="configdata"
+      ref="renderForm"
+    ></render-form>
   </div>
 </template>
 
 <script>
-import renderForm from "../components/renderForm.vue"
+import renderForm from "../components/renderForm.vue";
 import request from "../util/request.js";
 export default {
   components: {
@@ -13,24 +17,24 @@ export default {
   },
   data() {
     return {
-      configdata: null
+      configdata: null,
     };
   },
-  created(){
-    this.getConfigData()
+  created() {
+    this.getConfigData();
   },
-  methods:{
-    getConfigData(){
+  methods: {
+    getConfigData() {
       request
-      .get("http://localhost:3000/flow")
-      .then( res =>{
-        this.configdata = res;
-      })
-      .catch( error =>{
-        console.log(error)
-      })
-    }
-  }
+        .get("http://localhost:3000/flow")
+        .then((res) => {
+          this.configdata = res;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+  },
 };
 </script>
 

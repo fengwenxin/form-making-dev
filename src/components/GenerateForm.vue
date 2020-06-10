@@ -18,10 +18,14 @@
             :justify="item.options.justify"
             :align="item.options.align"
           >
-            <el-col v-for="(col, colIndex) in item.columns" :key="colIndex" :span="col.span">
+            <el-col
+              v-for="(col, colIndex) in item.columns"
+              :key="colIndex"
+              :span="col.span"
+            >
               <template v-for="citem in col.list">
                 <el-form-item
-                  v-if="citem.type=='blank'"
+                  v-if="citem.type == 'blank'"
                   :label="citem.name"
                   :prop="citem.model"
                   :key="citem.key"
@@ -56,6 +60,7 @@
             :widget="item"
             @input-change="onInputChange"
             @el-change="onElChange"
+            @text-enter="textEnter"
             :remote="remote"
             :ref="item.model"
             v-show="!item.options.hidden"
@@ -73,7 +78,7 @@ import { loadJs } from "../util/index.js";
 export default {
   name: "fm-generate-form",
   components: {
-    GenetateFormItem
+    GenetateFormItem,
   },
   /**
    * data为表单渲染原始数据
@@ -87,12 +92,11 @@ export default {
       isDataNull: true, // 判断props传入的data是否有真实数据
       models: {}, // form表单对象所有组件key value组成的json
       rules: {}, // form表单对象所有组件对应校验规则
-      hideObj: {}, // 后期添加非form making自有属性，用于存储表单隐藏条件的字段
       haveHide: false, // 后期添加非form making自有属性，是否触发过节点隐藏
       allInput: [], //全部input节点
       allInputsmark: [], // 由true false填充的全部input节点
       focusIndex: 0, // 后期添加非form making自有属性，当前可聚焦节点下标
-      intervalId: null,   //定时器ID
+      intervalId: null, //定时器ID
     };
   },
   mounted() {
@@ -100,33 +104,68 @@ export default {
     this.intervalId = setInterval(() => {
       if (!this.isDataNull) {
         this.flowHandel(this.data.list);
-        clearInterval(this.intervalId)
+        clearInterval(this.intervalId);
       }
     }, 200);
-    
   },
   methods: {
     // 数据初始化完成后流程控制操作
     flowHandel(flowData) {
+      let allinputIndex = [];    //所有可聚焦input元素的下标数组
+      let allareaIndex = [];     //所有可聚焦textarea元素的下标数组
+      let insertIndex = 0;       //当前插入的input下标
+      let insertarea = 0;        //当前插入的textarea下标
+      let allInput = document.querySelectorAll("input");
+      allInput = Array.from(allInput);
+      let allTextarea = document.querySelectorAll("textarea");
+      allTextarea = Array.from(allTextarea)
       for (let i = 0; i < flowData.length; i++) {
         this.hideData(flowData[i], i);
         this.setInputItems(flowData[i]);
+        if(flowData[i].type == "radio" || flowData[i].type == "checkbox"){
+          insertIndex += flowData[i].options.options.length
+        }else if(flowData[i].type == "select" || flowData[i].type == "color" || flowData[i].type == "switch"){
+          insertIndex++
+        }
+        if (
+          flowData[i].type == "input" ||
+          flowData[i].type == "date"  ||
+          flowData[i].type == "number"  ||
+          flowData[i].type == "time"
+        ) {
+          allinputIndex.push(insertIndex);
+          insertIndex++;
+        } else if (flowData[i].type == "textarea") {
+          insertarea += insertIndex
+          allareaIndex.push(insertIndex);
+          insertarea++;
+        }
       }
-      this.allInput = document.querySelectorAll("input");
+      console.log(allinputIndex)
+      for(let j=0;j<allinputIndex.length;j++){
+        this.allInput.push(allInput[allinputIndex[j]])
+      }
+      for(let t=0;t<allareaIndex.length;t++){
+        this.allInput.splice(allareaIndex[t],0,allTextarea[t])
+      }
+      console.log(this.allInput)
       this.handelFocus();
-      console.log(this.focusIndex)
     },
     // 动态数据处理函数
     dynamicData(targetdata) {
       // 动态数据赋值
-      let pdf = this.dyData.platform;
+      let platform = this.dyData.platform;
       let user = this.dyData.user;
       if (
         targetdata.options.defaultValue != "" &&
         targetdata.options.defaultValue[0] == "@"
       ) {
         var temp = targetdata.options.defaultValue.substring(1);
-        var tempJson = eval(temp);
+        try {
+          var tempJson = eval(temp);
+        } catch (error) {
+          throw new Error(error);
+        }
         if (tempJson != "" || tempJson != null) {
           targetdata.options.defaultValue = tempJson;
         }
@@ -135,22 +174,12 @@ export default {
     // 生成models、rules对象
     generateModle(genList) {
       for (let i = 0; i < genList.length; i++) {
-        //  FIXME 设置响应式属性 hideObj
-
-        if (genList[i].hidden && genList[i].hidden !== "") {
-          this.$set(
-            this.hideObj,
-            genList[i].model,
-            genList[i].options.defaultValue || ""
-          );
-        }
-        // FIXME 动态数据处理
         this.dynamicData(genList[i]);
 
         // 流控引擎数据处理(数据暂时没有与组件绑定的，先不处理)
 
         if (genList[i].type === "grid") {
-          genList[i].columns.forEach(item => {
+          genList[i].columns.forEach((item) => {
             this.generateModle(item.list);
           });
         } else {
@@ -190,7 +219,7 @@ export default {
             // 执行此段代码后rules的每个属性为组件默认校验规则和传入检验规则组成的数组
             this.rules[genList[i].model] = [
               ...this.rules[genList[i].model], // 将当前数组值展开
-              ...genList[i].rules.map(item => {
+              ...genList[i].rules.map((item) => {
                 // 展开当前组件的校验规则数组，遍历数组每一项（为json）
                 if (item.pattern) {
                   // 如果存在 pattern属性则返回一个新对象，该对象包含此条校验规则的所有属性以及pattern属性，值为item.pattern的返回值
@@ -199,18 +228,18 @@ export default {
                   // 不存在pattern属性则返回所有item组成的新对象
                   return { ...item };
                 }
-              })
+              }),
             ];
           } else {
             // 如果rules对象不存在当前组件的校验规则则展开传入的校验规则
             this.rules[genList[i].model] = [
-              ...genList[i].rules.map(item => {
+              ...genList[i].rules.map((item) => {
                 if (item.pattern) {
                   return { ...item, pattern: eval(item.pattern) };
                 } else {
                   return { ...item };
                 }
-              })
+              }),
             ];
           }
         }
@@ -220,7 +249,7 @@ export default {
     getData() {
       return new Promise((resolve, reject) => {
         // 执行form表单验证函数
-        this.$refs.generateForm.validate(valid => {
+        this.$refs.generateForm.validate((valid) => {
           if (valid) {
             // 逐条验证当前组件的校验规则
             resolve(this.models);
@@ -238,11 +267,41 @@ export default {
     hideData(activedata, activeIndex) {
       //判断显示隐藏
       if (activedata.hidden && activedata.hidden !== "") {
-        if (eval(activedata.hidden)) {
+        let result;
+        // 判断是否是函数体
+        console.log(activedata.hidden.indexOf("function"));
+        if (activedata.hidden.indexOf("function") != -1) {
+          try {
+            let tmpFunc = eval("(" + activedata.hidden + ")");
+            result = tmpFunc.call(this);
+          } catch (error) {
+            throw new Error(error);
+          }
+        } else if (
+          activedata.hidden.indexOf("function") == -1 &&
+          activedata.hidden.indexOf("if") != -1
+        ) {
+          let tmpFunc = new Function(activedata.hidden);
+          try {
+            result = tmpFunc.call(this);
+          } catch (error) {
+            throw new Error(error);
+          }
+        } else {
+          try {
+            result = eval(activedata.hidden);
+          } catch (error) {
+            throw new Error(error);
+          }
+        }
+        console.log(result)
+        if (result) {
+          console.log("1")
           this.haveHide = true;
           activedata.options.hidden = true;
           this.allInputsmark[activeIndex] = false;
-        } else if (this.haveHide && !eval(activedata.hidden)) {
+        } else if (this.haveHide && !result) {
+          console.log("2")
           activedata.options.hidden = false;
           this.allInputsmark[activeIndex] = true;
         }
@@ -250,7 +309,6 @@ export default {
     },
     // 监听表单数据改变
     onInputChange(value, field) {
-      this.hideObj[field] = value;
       let originData = this.data.list;
       for (let i = 0; i < originData.length; i++) {
         this.hideData(originData[i], i);
@@ -262,13 +320,21 @@ export default {
     setInputItems(originData) {
       // 显示且非禁用元素
       if (
-        originData.options.hidden == true ||
-        originData.options.disabled ||
-        originData.options.readonly == "readonly"
+        originData.type == "input" ||
+        originData.type == "textarea" ||
+        originData.type == "date" ||
+        originData.type == "time" ||
+        originData.type == "number"
       ) {
-        this.allInputsmark.push(false);
-      } else {
-        this.allInputsmark.push(true);
+        if (
+          originData.options.hidden == true ||
+          originData.options.disabled ||
+          originData.options.readonly == "readonly"
+        ) {
+          this.allInputsmark.push(false);
+        } else {
+          this.allInputsmark.push(true);
+        }
       }
     },
     // 光标操作控制流程
@@ -276,7 +342,6 @@ export default {
       for (let i = this.focusIndex; i < this.allInputsmark.length; i++) {
         if (this.allInputsmark[i]) {
           this.allInput[i].focus();
-          console.log(this.focusIndex)
           this.focusIndex = i + 1;
           break;
         }
@@ -284,11 +349,19 @@ export default {
     },
     // 监听input组件发射的el-change事件
     onElChange(e) {
-      this.getData().then(resolve => {
+      this.getData().then((resolve) => {
+        // 显示隐藏放到光标离开时判断
+        let originData = this.data.list;
+        for (let i = 0; i < originData.length; i++) {
+          this.hideData(originData[i], i);
+        }
         this.handelFocus();
-        console.log(this.focusIndex)
+        console.log(this.focusIndex);
       });
       this.$emit("input-enter");
+    },
+    textEnter(){
+      this.handelFocus();
     }
   },
   watch: {
@@ -298,7 +371,7 @@ export default {
       handler(val) {
         this.isDataNull = false;
         this.generateModle(val.list);
-      }
+      },
     },
     value: {
       // 深度观察组件key值
@@ -306,9 +379,9 @@ export default {
       handler(val) {
         console.log(JSON.stringify(val));
         this.models = { ...this.models, ...val };
-      }
-    }
-  }
+      },
+    },
+  },
 };
 </script>
 

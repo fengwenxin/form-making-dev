@@ -5,6 +5,14 @@
 </template>
 
 <script>
+// input_config对应的函数值
+function input_config_EE() {
+  return {
+    amount: '流控数据',
+    transferType: 'flow.platform.transferType',
+    user: '622002'
+  }
+}
 import fmGenerateForm from "./GenerateForm";
 import request from "../util/request.js";
 export default {
@@ -30,12 +38,14 @@ export default {
   created() {
     this.getConfigData(this.configdata);
     this.setDynamicData()
+    this.getInputData()
   },
   methods: {
     // 获取表单配置信息
     getConfigData(configdata) {
-      let codeId = configdata.list[0].input_config_code;
-      request
+      if(configdata.list[0].input_config_code){
+        let codeId = configdata.list[0].input_config_code;
+        request
         .get("http://localhost:3000/from",{
           params:{
             id: codeId
@@ -47,10 +57,19 @@ export default {
         .catch(error => {
           console.log(error);
         });
+      }else{
+        return false
+      }
     },
     // 将流控引擎input数据绑定到value
     getInputData(){
-      this.formdata = this.configdata.input_config
+      try {
+        let transObj = eval("("+this.configdata.list[0].input_config+")")()
+        this.formdata = transObj
+      } catch (error) {
+        throw new Error("input_config解析出错")
+      }
+      
     },
     // 动态数据获取
     setDynamicData(){

@@ -1,6 +1,7 @@
 <template>
   <el-form-item :label="widget.name" :prop="widget.model">
     <template v-if="widget.type == 'input'">
+      <!-- <div  class="cus-tips">{{widget.options.tips}}</div> -->
       <el-input
         v-if="widget.options.dataType == 'number' || widget.options.dataType == 'integer' || widget.options.dataType == 'float'"
         type="number"
@@ -19,7 +20,7 @@
         :style="{width: widget.options.width}"
         @keyup.native.enter="change"
         :ref="widget.model"
-      ></el-input>
+      ><el-button v-if="widget.options.tips" slot="append" icon="el-icon-question" @click="showTips(widget.options.tips)"></el-button></el-input>
     </template>
     <template v-if="widget.type == 'hrinput'">
       <hr-input
@@ -39,6 +40,7 @@
         :disabled="widget.options.disabled"
         :placeholder="widget.options.placeholder"
         :style="{width: widget.options.width}"
+        @keyup.native.ctrl.enter="areaHandel"
       ></el-input>
     </template>
 
@@ -49,6 +51,7 @@
         :step="widget.options.step"
         controls-position="right"
         :disabled="widget.options.disabled"
+        @keyup.native.enter="change"
       ></el-input-number>
     </template>
 
@@ -102,6 +105,7 @@
         :arrowControl="widget.options.arrowControl"
         :value-format="widget.options.format"
         :style="{width: widget.options.width}"
+        @keyup.native.enter="change"
       ></el-time-picker>
     </template>
 
@@ -119,6 +123,7 @@
         :value-format="widget.options.timestamp ? 'timestamp' : widget.options.format"
         :format="widget.options.format"
         :style="{width: widget.options.width}"
+        @keyup.native.enter="change"
       ></el-date-picker>
     </template>
 
@@ -258,10 +263,21 @@ export default {
       //   focus()
       // })
     },
+    showTips(msg){
+      this.$message({
+          showClose: true,
+          duration: 5000,
+          message: msg
+        });
+    },
     // element change事件，回车和失去焦点时触发
     change(){
       // 出发change事件时发射 el-change事件，generateform组件监听该事件
       this.$emit("el-change",this)
+    },
+    // textarea ctrl+enter事件
+    areaHandel(e){
+      this.$emit("text-enter",this)
     }
   },
   watch: {
