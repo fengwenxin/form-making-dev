@@ -64,7 +64,7 @@ export default {
     // 将流控引擎input数据绑定到value
     getInputData(){
       try {
-        let transObj = eval("("+this.configdata.list[0].input_config+")")()
+        let transObj = eval("("+this.configdata.list[0].input_config+")")()  //封装
         this.formdata = transObj
       } catch (error) {
         throw new Error("input_config解析出错")

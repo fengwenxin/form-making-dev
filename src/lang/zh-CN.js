@@ -77,6 +77,9 @@ export default {
         customClass: '自定义Class'
       },
       widget: {
+        condition: '离开条件',  //新增离开条件
+        assignment: '离开赋值', //新增离开赋值
+        hidden: '隐藏条件',     //新增隐藏条件
         title: '字段属性',
         model: '字段标识',
         name: '标题',
@@ -160,7 +163,6 @@ export default {
         customClass: '自定义Class',
         attribute: '操作属性',
         dataBind: '数据绑定',
-        hidden: '隐藏条件',         //编写隐藏条件按钮
         readonly: '完全只读',
         disabled: '禁用',
         editable: '文本框可输入',

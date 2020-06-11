@@ -7,12 +7,6 @@
       <el-form-item :label="$t('fm.config.widget.name')" v-if="data.type!='grid'">
         <el-input v-model="data.name"></el-input>
       </el-form-item>
-      <!-- 是否隐藏 -->
-      <el-form-item :label="$t('fm.config.widget.hidden')" v-if="data.type!='grid'">
-        <el-button @click="handelMirror">点击编写隐藏条件</el-button>
-        <!-- <el-input type="textarea" v-model="data.hidden"></el-input> -->
-      </el-form-item>
-
       <el-form-item :label="$t('fm.config.widget.width')" v-if="Object.keys(data.options).indexOf('width')>=0">
         <el-input v-model="data.options.width"></el-input>
       </el-form-item>
@@ -53,11 +47,25 @@
       <el-form-item :label="$t('fm.config.widget.filterable')" v-if="data.type=='select'">
         <el-switch v-model="data.options.filterable"></el-switch>
       </el-form-item>
+       
       <el-form-item label="$t('fm.config.widget.allowHalf')" v-if="Object.keys(data.options).indexOf('allowHalf')>=0">
         <el-switch
             v-model="data.options.allowHalf"
           >
           </el-switch>
+      </el-form-item>
+      <!-- 是否隐藏 -->
+      <el-form-item :label="$t('fm.config.widget.hidden')" v-if="data.type!='grid'">
+        <el-button @click="handelMirror">点击编写隐藏条件</el-button>
+        <!-- <el-input type="textarea" v-model="data.hidden"></el-input> -->
+      </el-form-item>
+      <!-- 离开条件 -->
+      <el-form-item :label="$t('fm.config.widget.condition')" v-if="data.type!='grid'">
+        <el-button @click="handelMirror">点击编写离开条件</el-button>
+      </el-form-item>
+      <!-- 离开赋值 -->
+      <el-form-item :label="$t('fm.config.widget.assignment')" v-if="data.type!='grid'">
+        <el-button @click="handelMirror">点击编写赋值操作</el-button>
       </el-form-item>
       <el-form-item :label="$t('fm.config.widget.showAlpha')" v-if="Object.keys(data.options).indexOf('showAlpha')>=0">
         <el-switch
@@ -370,9 +378,8 @@ export default {
   },
   methods: {
     // codeMirror弹出函数
-    handelMirror(){
-      console.log(this.data)
-      this.$emit("mirror", this.data)
+    handelMirror(e){
+      this.$emit("mirror", this.data,e.target.innerText)
     },
     handleOptionsRemove (index) {
       if (this.data.type === 'grid') {

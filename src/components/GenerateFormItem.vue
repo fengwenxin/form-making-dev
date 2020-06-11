@@ -20,7 +20,7 @@
         :style="{width: widget.options.width}"
         @keyup.native.enter="change"
         :ref="widget.model"
-      ><el-button v-if="widget.options.tips" slot="append" icon="el-icon-question" @click="showTips(widget.options.tips)"></el-button></el-input>
+      ><el-button v-if="widget.options.tips" slot="prepend" icon="el-icon-question" @click="showTips(widget.options.tips)"></el-button></el-input>
     </template>
     <template v-if="widget.type == 'hrinput'">
       <hr-input

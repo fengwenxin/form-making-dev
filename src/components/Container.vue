@@ -248,6 +248,7 @@ export default {
       },
       mirrorVisible: false,
       nowEle: {},   //当前编辑的组件对象
+      modify: "",   //当前编辑的是哪个属性
       basicComponents,
       layoutComponents,
       advanceComponents,
@@ -333,8 +334,9 @@ export default {
       })
     },
     // mirror控制函数
-    showMirror(parms){
-      console.log(parms)
+    showMirror(parms,modify){
+      console.log(modify)
+      this.modify = modify
       this.nowEle = parms
       this.mirrorVisible = true
     },
@@ -345,7 +347,13 @@ export default {
     },
     // 获取mirror输入的代码
     getCode(){
-      this.nowEle.hidden = this.code;
+      if(this.modify=="点击编写隐藏条件"){
+        this.nowEle.hidden = this.code;
+      }else if (this.modify=="点击编写离开条件"){
+        this.nowEle.condition = this.code;
+      }else if (this.modify=="点击编写赋值操作"){
+        this.nowEle.assignment = this.code;
+      }
       this.mirrorVisible = false
     },
     handleGoGithub () {

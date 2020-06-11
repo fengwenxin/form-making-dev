@@ -93,9 +93,10 @@ export default {
       models: {}, // form表单对象所有组件key value组成的json
       rules: {}, // form表单对象所有组件对应校验规则
       haveHide: false, // 后期添加非form making自有属性，是否触发过节点隐藏
-      allInput: [], //全部input节点
-      allInputsmark: [], // 由true false填充的全部input节点
-      focusIndex: 0, // 后期添加非form making自有属性，当前可聚焦节点下标
+      allItems: [],
+      canFocusInputArr: [],
+      startIndex: 0,
+      focusIndex: 0, // 后期添加非form making自有属性，当前可聚焦节点相对全局下标
       intervalId: null, //定时器ID
     };
   },
@@ -103,54 +104,12 @@ export default {
     // 这个定时器主要是解决父组件异步传值，子组件生命周期获取不到数据的问题
     this.intervalId = setInterval(() => {
       if (!this.isDataNull) {
-        this.flowHandel(this.data.list);
+        this.flowHandel();
         clearInterval(this.intervalId);
       }
     }, 200);
   },
   methods: {
-    // 数据初始化完成后流程控制操作
-    flowHandel(flowData) {
-      let allinputIndex = [];    //所有可聚焦input元素的下标数组
-      let allareaIndex = [];     //所有可聚焦textarea元素的下标数组
-      let insertIndex = 0;       //当前插入的input下标
-      let insertarea = 0;        //当前插入的textarea下标
-      let allInput = document.querySelectorAll("input");
-      allInput = Array.from(allInput);
-      let allTextarea = document.querySelectorAll("textarea");
-      allTextarea = Array.from(allTextarea)
-      for (let i = 0; i < flowData.length; i++) {
-        this.hideData(flowData[i], i);
-        this.setInputItems(flowData[i]);
-        if(flowData[i].type == "radio" || flowData[i].type == "checkbox"){
-          insertIndex += flowData[i].options.options.length
-        }else if(flowData[i].type == "select" || flowData[i].type == "color" || flowData[i].type == "switch"){
-          insertIndex++
-        }
-        if (
-          flowData[i].type == "input" ||
-          flowData[i].type == "date"  ||
-          flowData[i].type == "number"  ||
-          flowData[i].type == "time"
-        ) {
-          allinputIndex.push(insertIndex);
-          insertIndex++;
-        } else if (flowData[i].type == "textarea") {
-          insertarea += insertIndex
-          allareaIndex.push(insertIndex);
-          insertarea++;
-        }
-      }
-      console.log(allinputIndex)
-      for(let j=0;j<allinputIndex.length;j++){
-        this.allInput.push(allInput[allinputIndex[j]])
-      }
-      for(let t=0;t<allareaIndex.length;t++){
-        this.allInput.splice(allareaIndex[t],0,allTextarea[t])
-      }
-      console.log(this.allInput)
-      this.handelFocus();
-    },
     // 动态数据处理函数
     dynamicData(targetdata) {
       // 动态数据赋值
@@ -175,9 +134,6 @@ export default {
     generateModle(genList) {
       for (let i = 0; i < genList.length; i++) {
         this.dynamicData(genList[i]);
-
-        // 流控引擎数据处理(数据暂时没有与组件绑定的，先不处理)
-
         if (genList[i].type === "grid") {
           genList[i].columns.forEach((item) => {
             this.generateModle(item.list);
@@ -263,106 +219,179 @@ export default {
     reset() {
       this.$refs.generateForm.resetFields();
     },
-    // 数据改变时遍历数据判断隐藏条件
-    hideData(activedata, activeIndex) {
-      //判断显示隐藏
-      if (activedata.hidden && activedata.hidden !== "") {
-        let result;
-        // 判断是否是函数体
-        console.log(activedata.hidden.indexOf("function"));
-        if (activedata.hidden.indexOf("function") != -1) {
-          try {
-            let tmpFunc = eval("(" + activedata.hidden + ")");
-            result = tmpFunc.call(this);
-          } catch (error) {
-            throw new Error(error);
-          }
-        } else if (
-          activedata.hidden.indexOf("function") == -1 &&
-          activedata.hidden.indexOf("if") != -1
-        ) {
-          let tmpFunc = new Function(activedata.hidden);
-          try {
-            result = tmpFunc.call(this);
-          } catch (error) {
-            throw new Error(error);
-          }
-        } else {
-          try {
-            result = eval(activedata.hidden);
-          } catch (error) {
-            throw new Error(error);
-          }
-        }
-        console.log(result)
-        if (result) {
-          console.log("1")
-          this.haveHide = true;
-          activedata.options.hidden = true;
-          this.allInputsmark[activeIndex] = false;
-        } else if (this.haveHide && !result) {
-          console.log("2")
-          activedata.options.hidden = false;
-          this.allInputsmark[activeIndex] = true;
-        }
-      }
+    // 数据初始化完成后流程控制操作
+    flowHandel() {
+      this.handelHide();
+      this.allItems = document.querySelectorAll(".el-form-item");
+      this.getFocusEle();
+      this.handelFocus();
     },
+    // 运行时显隐控制
+    // handelHide() {
+    //   if (this.data.list[this.focusIndex].hidden && this.data.list[this.focusIndex].hidden!="") {
+    //     let hide = this.evalWrap(this.data.list[this.focusIndex].hidden);
+    //     console.log(hide);
+    //     if (hide) {
+    //       console.log("handelHide");
+    //       this.haveHide = true;
+    //       this.data.list[this.focusIndex].options.hidden = true;
+    //     }
+    //   }
+    // },
     // 监听表单数据改变
     onInputChange(value, field) {
-      let originData = this.data.list;
-      for (let i = 0; i < originData.length; i++) {
-        this.hideData(originData[i], i);
-      }
       // 向container组件发射on-change事件，将 key value 以及models（form表单的key value对象）传入
       this.$emit("on-change", field, value, this.models);
     },
-    // 全部input节点依据是否可用动态添加 true false 到 this.allInputsmark
-    setInputItems(originData) {
-      // 显示且非禁用元素
-      if (
-        originData.type == "input" ||
-        originData.type == "textarea" ||
-        originData.type == "date" ||
-        originData.type == "time" ||
-        originData.type == "number"
+    // eval封装
+    evalWrap(targetEval) {
+      let result;
+      if (targetEval.indexOf("function") != -1) {
+        try {
+          let tmpFunc = eval("(" + targetEval + ")");
+          result = tmpFunc.call(this);
+        } catch (error) {
+          throw new Error(error);
+        }
+      } else if (
+        targetEval.indexOf("function") == -1 &&
+        targetEval.indexOf("if") != -1
       ) {
+        let tmpFunc = new Function(targetEval);
+        try {
+          result = tmpFunc.call(this);
+        } catch (error) {
+          throw new Error(error);
+        }
+      } else {
+        try {
+          result = eval(targetEval);
+        } catch (error) {
+          throw new Error(error);
+        }
+      }
+      return result;
+    },
+    // 隐藏条件判断
+    handelHide() {
+      for (let i = 0; i < this.data.list.length; i++) {
+        if (this.data.list[i].hidden && this.data.list[i].hidden !== "") {
+          let hide = this.evalWrap(this.data.list[i].hidden);
+          console.log(hide);
+          if (hide) {
+            console.log("handelHide");
+            this.haveHide = true;
+            this.data.list[i].options.hidden = true;
+          }
+        }
+      }
+      this.getFocusEle()
+    },
+    // 离开条件检测
+    handelCondition() {
+      let condition = this.evalWrap(this.data.list[this.focusIndex].condition);
+      if (condition) {
+        this.handelHide();
+        this.handelFocus();
+      }
+    },
+    // 离开赋值
+    handelAssignment() {
+      this.evalWrap(this.data.list[this.focusIndex].assignment);
+    },
+    // 全部可聚焦input节点下标加入一个全局数组维护
+    getFocusEle() {
+      this.canFocusInputArr = [];
+      let flowData = this.data.list;
+      for (let i = 0; i < flowData.length; i++) {
         if (
-          originData.options.hidden == true ||
-          originData.options.disabled ||
-          originData.options.readonly == "readonly"
+          flowData[i].options.disabled ||
+          flowData[i].options.hidden ||
+          flowData[i].options.readonly == "readonly"
         ) {
-          this.allInputsmark.push(false);
+          continue;
         } else {
-          this.allInputsmark.push(true);
+          if (
+            flowData[i].type == "input" ||
+            flowData[i].type == "date" ||
+            flowData[i].type == "number" ||
+            flowData[i].type == "time"
+          ) {
+            this.canFocusInputArr.push(i);
+          } else if (flowData[i].type == "textarea") {
+            if (
+              !flowData[i].options.disabled ||
+              !flowData[i].options.hidden ||
+              flowData[i].options.readonly != "readonly"
+            ) {
+              this.canFocusInputArr.push(i);
+            }
+          }
         }
       }
     },
     // 光标操作控制流程
     handelFocus() {
-      for (let i = this.focusIndex; i < this.allInputsmark.length; i++) {
-        if (this.allInputsmark[i]) {
-          this.allInput[i].focus();
-          this.focusIndex = i + 1;
-          break;
+      for (let i = this.startIndex; i < this.canFocusInputArr.length; i++) {
+        let nowInput = this.allItems[this.canFocusInputArr[i]].querySelector(
+          "input"
+        );
+        let nowTextraea = this.allItems[this.canFocusInputArr[i]].querySelector(
+          "textarea"
+        );
+        if (nowInput) {
+          nowInput.focus();
+        } else if (nowTextraea) {
+          nowTextraea.focus();
         }
+        this.startIndex = i + 1;
+        this.focusIndex = this.canFocusInputArr[i];
+        console.log(this.focusIndex);
+        break;
       }
     },
     // 监听input组件发射的el-change事件
     onElChange(e) {
       this.getData().then((resolve) => {
-        // 显示隐藏放到光标离开时判断
-        let originData = this.data.list;
-        for (let i = 0; i < originData.length; i++) {
-          this.hideData(originData[i], i);
+        // 无赋值条件和离开条件
+        if (
+          !this.data.list[this.focusIndex].assignment &&
+          !this.data.list[this.focusIndex].condition
+        ) {
+          console.log("none");
+          this.handelHide();
+          this.handelFocus();
+        } else if (
+          // 有赋值无离开条件
+          this.data.list[this.focusIndex].assignment &&
+          !this.data.list[this.focusIndex].condition
+        ) {
+          console.log("assignment");
+          this.handelAssignment();
+          this.handelHide();
+          this.handelFocus();
+        } else if (
+          this.data.list[this.focusIndex].condition != "" &&
+          !this.data.list[this.focusIndex].assignment
+        ) {
+          // 有离开条件无赋值条件
+          console.log("condition");
+          this.handelCondition();
+        } else if (
+          this.data.list[this.focusIndex].assignment &&
+          this.data.list[this.focusIndex].condition
+        ) {
+          // 既有离开条件又有离开赋值
+          console.log("all");
+          this.handelAssignment();
+          this.handelCondition();
         }
-        this.handelFocus();
-        console.log(this.focusIndex);
       });
       this.$emit("input-enter");
     },
-    textEnter(){
+    textEnter() {
       this.handelFocus();
-    }
+    },
   },
   watch: {
     data: {
