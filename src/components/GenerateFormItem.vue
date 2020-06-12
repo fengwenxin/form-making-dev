@@ -1,6 +1,9 @@
 <template>
   <el-form-item :label="widget.name" :prop="widget.model">
+      <!--{{widget}}-->
+      {{rules}}
     <template v-if="widget.type == 'input'">
+        <!--this type is input-->
       <!-- <div  class="cus-tips">{{widget.options.tips}}</div> -->
       <el-input
         v-if="widget.options.dataType == 'number' || widget.options.dataType == 'integer' || widget.options.dataType == 'float'"
@@ -10,10 +13,23 @@
         :style="{width: widget.options.width}"
         :disabled="widget.options.disabled"
       ></el-input>
+
+      <!--金额控件-->
+      <div v-else-if="widget.options.amountmoney == true"  class="el-input el-input--small">
+       <!-- <input class="el-input__inner"
+               @keydown="inputHandler(widget.key)"
+               @focus="inputHandler(widget.key)"
+               @keyup="keyupHandler(widget.key)"
+               @blur="blurHandler()"
+               :ref="widget.key"
+               v-model="dataModel" type="text">-->
+      </div>
+
       <!-- dataType为组件类型 dataModel为双向绑定的数据 -->
+        <!--:type="widget.options.dataType"-->
       <el-input
         v-else
-        :type="widget.options.dataType"
+        :type="widget.options.dataType == 'againpassword' ? 'password' : widget.options.dataType"
         v-model="dataModel"
         :disabled="widget.options.disabled"
         :placeholder="widget.options.placeholder"

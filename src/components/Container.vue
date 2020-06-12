@@ -4,15 +4,32 @@
       <el-container>
         <el-aside width="250px">
           <div class="components-list">
+            <template v-if="bankingFields.length">
+              <div class="widget-cate">{{$t('fm.components.banking.title')}}</div>
+              <draggable tag="ul" :list="bankingComponents"
+                         v-bind="{group:{ name:'people', pull:'clone',put:false},sort:false, ghostClass: 'ghost'}"
+                         @end="handleMoveEnd"
+                         @start="handleMoveStart"
+                         :move="handleMove"
+              >
+
+                <li v-if="bankingFields.indexOf(item.type)>=0" class="form-edit-widget-label" :class="{'no-put': item.type == 'divider'}" v-for="(item, index) in bankingComponents" :key="index">
+                  <a>
+                    <i class="icon iconfont" :class="item.icon"></i>
+                    <span>{{item.name}}</span>
+                  </a>
+                </li>
+              </draggable>
+            </template>
             <template v-if="basicFields.length">
               <div class="widget-cate">{{$t('fm.components.basic.title')}}</div>
-              <draggable tag="ul" :list="basicComponents" 
+              <draggable tag="ul" :list="basicComponents"
                 v-bind="{group:{ name:'people', pull:'clone',put:false},sort:false, ghostClass: 'ghost'}"
                 @end="handleMoveEnd"
                 @start="handleMoveStart"
                 :move="handleMove"
               >
-                
+
                 <li v-if="basicFields.indexOf(item.type)>=0" class="form-edit-widget-label" :class="{'no-put': item.type == 'divider'}" v-for="(item, index) in basicComponents" :key="index">
                   <a>
                     <i class="icon iconfont" :class="item.icon"></i>
@@ -21,16 +38,16 @@
                 </li>
               </draggable>
             </template>
-            
+
             <template v-if="advanceFields.length">
               <div class="widget-cate">{{$t('fm.components.advance.title')}}</div>
-              <draggable tag="ul" :list="advanceComponents" 
+              <draggable tag="ul" :list="advanceComponents"
                 v-bind="{group:{ name:'people', pull:'clone',put:false},sort:false, ghostClass: 'ghost'}"
                 @end="handleMoveEnd"
                 @start="handleMoveStart"
                 :move="handleMove"
               >
-                
+
                 <li v-if="advanceFields.indexOf(item.type) >= 0" class="form-edit-widget-label" :class="{'no-put': item.type == 'table'}" v-for="(item, index) in advanceComponents" :key="index">
                   <a>
                     <i class="icon iconfont" :class="item.icon"></i>
@@ -40,16 +57,16 @@
               </draggable>
             </template>
 
-            
+
             <template v-if="layoutFields.length">
               <div class="widget-cate">{{$t('fm.components.layout.title')}}</div>
-              <draggable tag="ul" :list="layoutComponents" 
+              <draggable tag="ul" :list="layoutComponents"
                 v-bind="{group:{ name:'people', pull:'clone',put:false},sort:false, ghostClass: 'ghost'}"
                 @end="handleMoveEnd"
                 @start="handleMoveStart"
                 :move="handleMove"
               >
-                
+
                 <li v-if="layoutFields.indexOf(item.type) >=0" class="form-edit-widget-label no-put" v-for="(item, index) in layoutComponents" :key="index">
                   <a>
                     <i class="icon iconfont" :class="item.icon"></i>
@@ -58,9 +75,9 @@
                 </li>
               </draggable>
             </template>
-            
+
           </div>
-          
+
         </el-aside>
         <el-container class="center-container" direction="vertical">
           <el-header class="btn-bar" style="height: 45px;">
@@ -73,11 +90,11 @@
             <el-button v-if="generateCode" type="text" size="medium" icon="el-icon-document" @click="handleGenerateCode">{{$t('fm.actions.code')}}</el-button>
           </el-header>
           <el-main :class="{'widget-empty': widgetForm.list.length == 0}">
-            
+
             <widget-form v-if="!resetJson"  ref="widgetForm" :data="widgetForm" :select.sync="widgetFormSelect"></widget-form>
           </el-main>
         </el-container>
-        
+
         <el-aside class="widget-config-container">
           <el-container>
             <el-header height="45px">
@@ -89,7 +106,7 @@
               <form-config v-show="configTab=='form'" :data="widgetForm.config"></form-config>
             </el-main>
           </el-container>
-          
+
         </el-aside>
 
         <cus-dialog
@@ -132,9 +149,9 @@
           width="800px"
           form
         >
-          
+
           <div id="jsoneditor" style="height: 400px;width: 100%;">{{jsonTemplate}}</div>
-          
+
           <template slot="action">
             <el-button type="primary" class="json-btn" :data-clipboard-text="jsonCopyValue">{{$t('fm.actions.copyData')}}</el-button>
           </template>
@@ -168,13 +185,13 @@
           form
         >
           <codemirror v-model="code" :options="cmOptions"></codemirror>
-          
+
         </cus-dialog>
       </el-container>
     </el-main>
     <el-footer height="30px" style="font-weight: 600;">Powered by <a target="_blank" href="https://github.com/GavinZhuLei/vue-form-making">vue-form-making</a></el-footer>
   </el-container>
-  
+
 </template>
 
 <script>
@@ -186,6 +203,7 @@ import CusDialog from './CusDialog'
 import GenerateForm from './GenerateForm'
 import Clipboard from 'clipboard'
 import {basicComponents, layoutComponents, advanceComponents} from './componentsConfig.js'
+import {bankingComponents} from './componentsBankingConfig.js'
 import {loadJs, loadCss} from '../util/index.js'
 import request from '../util/request.js'
 import generateCode from './generateCode.js'
@@ -216,12 +234,16 @@ export default {
       default: false
     },
     upload: {
-      type: Boolean, 
+      type: Boolean,
       default: false
     },
     clearable: {
       type: Boolean,
       default: false
+    },
+    bankingFields:{
+        type: Array,
+        default: () => ['input',]
     },
     basicFields: {
       type: Array,
@@ -249,6 +271,7 @@ export default {
       mirrorVisible: false,
       nowEle: {},   //当前编辑的组件对象
       modify: "",   //当前编辑的是哪个属性
+        bankingComponents,
       basicComponents,
       layoutComponents,
       advanceComponents,
@@ -313,6 +336,14 @@ export default {
   methods: {
     // 为每个组件添加name属性
     _loadComponents () {
+
+        // 金融控件
+      this.bankingComponents = this.bankingComponents.map(item=>{
+        return {
+            ...item,
+            name: this.$t(`fm.components.nFields.${item.type}`),
+        }
+      })
       this.basicComponents = this.basicComponents.map(item => {
         return {
           ...item,

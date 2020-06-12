@@ -1,6 +1,9 @@
 export default {
   fm: {
     components: {
+      nFields:{
+          input: '密码控件',
+      },
       fields: {
         hrinput: "华软input",
         input: '单行文本',
@@ -25,6 +28,9 @@ export default {
         grid: '栅格布局',
         tabs: '标签页',
         divider: '分割线'
+      },
+      banking:{
+        title:"金融组件"
       },
       basic: {
         title: '基础字段',
@@ -135,6 +141,8 @@ export default {
         integer: '整数',
         float: '浮点数',
         url: 'URL地址',
+          password: '密码',
+          againpassword: '确认密码',
         email: '邮箱地址',
         hex: '十六进制',
         gutter: '栅格间隔',
@@ -156,8 +164,8 @@ export default {
         borderCard: '卡片化',
         tabPosition: '选项卡位置',
         top: '顶部',
-        left: '左侧',
-        right: '右侧',
+        // left: '左侧',
+        // right: '右侧',
         bottom: '底部',
         tabOption: '标签配置项',
         tabName: '标签名称',
@@ -179,7 +187,8 @@ export default {
         tab: '标签页',
         validatorRequired: '必须填写',
         validatorType: '格式不正确',
-        validatorPattern: '格式不匹配'
+        validatorPattern: '格式不匹配',
+          confirm_field:"确认字段"
       }
     },
     upload: {
