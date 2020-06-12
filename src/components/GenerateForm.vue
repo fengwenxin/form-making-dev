@@ -100,6 +100,10 @@ export default {
       intervalId: null, //定时器ID
     };
   },
+  // 源码里有created钩子，但是请求外部接口数据是存在父子组件异步传值问题，会报错，传入的data为空对象
+  // created(){
+  //   this.generateModle(this.data.list)
+  // },
   mounted() {
     // 这个定时器主要是解决父组件异步传值，子组件生命周期获取不到数据的问题
     this.intervalId = setInterval(() => {
@@ -290,9 +294,13 @@ export default {
     // 离开条件检测
     handelCondition() {
       let condition = this.evalWrap(this.data.list[this.focusIndex].condition);
+      console.log(this.data.list[this.focusIndex].condition)
       if (condition) {
         this.handelHide();
         this.handelFocus();
+      }else{
+        this.$refs['generateForm'].fields[this.focusIndex].validateMessage = '不满足离开条件'
+        this.$refs['generateForm'].fields[this.focusIndex].validateState = 'error'
       }
     },
     // 离开赋值
@@ -327,7 +335,7 @@ export default {
           resultReg.test(nowValue)
         }
       }else{
-        return false
+        return true
       }
     },
     // 全部可聚焦input节点下标加入一个全局数组维护

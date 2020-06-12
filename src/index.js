@@ -3,6 +3,7 @@ import 'normalize.css/normalize.css'
 
 import MakingForm from './components/Container.vue'
 import GenerateForm from './components/GenerateForm.vue'
+import renderForm from './components/renderForm.vue'
 
 import enUS from './lang/en-US'
 import zhCN from './lang/zh-CN'
@@ -46,9 +47,19 @@ GenerateForm.install = function (Vue, opts = {
   Vue.component(GenerateForm.name, GenerateForm)
 }
 
+renderForm.install = function (Vue, opts = {
+  lang: 'zh-CN',
+  locale: null,
+  i18n: null
+}) {
+  loadLang(Vue, opts.lang, opts.locale, opts.i18n)
+  Vue.component(renderForm.name, renderForm)
+}
+
 const components = [
   MakingForm,
-  GenerateForm
+  GenerateForm,
+  renderForm
 ]
 
 const install = function (Vue, opts = {
@@ -69,11 +80,13 @@ if (typeof window !== 'undefined' && window.Vue) {
 export {
   install,
   MakingForm,
-  GenerateForm
+  GenerateForm,
+  renderForm
 }
 
 export default {
   install,
   MakingForm,
-  GenerateForm
+  GenerateForm,
+  renderForm
 }
