@@ -243,7 +243,7 @@ export default {
     },
     bankingFields:{
         type: Array,
-        default: () => ['input',]
+        default: () => ['password','againpassword',"amount"]
     },
     basicFields: {
       type: Array,
