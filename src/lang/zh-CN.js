@@ -2,7 +2,9 @@ export default {
   fm: {
     components: {
       nFields:{
-          input: '密码控件',
+          password: '密码控件',
+          againpassword: '确认密码控件',
+          amount: '金额控件',
       },
       fields: {
         hrinput: "华软input",

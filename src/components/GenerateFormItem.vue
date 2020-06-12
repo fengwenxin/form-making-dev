@@ -2,8 +2,51 @@
   <el-form-item :label="widget.name" :prop="widget.model">
       <!--{{widget}}-->
       {{rules}}
+      <!--金额控件-->
+      <template v-if="widget.type == 'amount'">
+          <!--放大镜-->
+          <transition name="fade">
+              <div v-if="widget.options.amountmoney && amountvisible" class="mglass">
+                  <div class="mglass-data">{{dataModel}} <br></div>
+                  <div class="mglass-big">{{bigPastAdjustFee}}</div>
+              </div>
+          </transition>
+          <div class="el-input el-input--small">
+              <input class="el-input__inner"
+                     @keydown="inputHandler(widget.key)"
+                     @focus="inputHandler(widget.key)"
+                     @keyup="keyupHandler(widget.key)"
+                     @blur="blurHandler()"
+                     :ref="widget.key"
+                     v-model="dataModel" type="text">
+          </div>
+      </template>
+        <!--密码-->
+      <template v-if="widget.type == 'password'">
+          <el-input
+                  type="password"
+                  v-model="dataModel"
+                  :disabled="widget.options.disabled"
+                  :placeholder="widget.options.placeholder"
+                  :style="{width: widget.options.width}"
+                  @keyup.native.enter="change"
+                  :ref="widget.model"
+          ><el-button v-if="widget.options.tips" slot="prepend" icon="el-icon-question" @click="showTips(widget.options.tips)"></el-button></el-input>
+      </template>
+      <!--确认密码-->
+      <template v-if="widget.type == 'againpassword'">
+          <el-input
+                  type="password"
+                  v-model="dataModel"
+                  :disabled="widget.options.disabled"
+                  :placeholder="widget.options.placeholder"
+                  :style="{width: widget.options.width}"
+                  @keyup.native.enter="change"
+                  :ref="widget.model"
+          ><el-button v-if="widget.options.tips" slot="prepend" icon="el-icon-question" @click="showTips(widget.options.tips)"></el-button></el-input>
+      </template>
+
     <template v-if="widget.type == 'input'">
-        <!--this type is input-->
       <!-- <div  class="cus-tips">{{widget.options.tips}}</div> -->
       <el-input
         v-if="widget.options.dataType == 'number' || widget.options.dataType == 'integer' || widget.options.dataType == 'float'"
@@ -14,22 +57,10 @@
         :disabled="widget.options.disabled"
       ></el-input>
 
-      <!--金额控件-->
-      <div v-else-if="widget.options.amountmoney == true"  class="el-input el-input--small">
-       <!-- <input class="el-input__inner"
-               @keydown="inputHandler(widget.key)"
-               @focus="inputHandler(widget.key)"
-               @keyup="keyupHandler(widget.key)"
-               @blur="blurHandler()"
-               :ref="widget.key"
-               v-model="dataModel" type="text">-->
-      </div>
-
       <!-- dataType为组件类型 dataModel为双向绑定的数据 -->
-        <!--:type="widget.options.dataType"-->
       <el-input
         v-else
-        :type="widget.options.dataType == 'againpassword' ? 'password' : widget.options.dataType"
+        :type="widget.options.dataType"
         v-model="dataModel"
         :disabled="widget.options.disabled"
         :placeholder="widget.options.placeholder"
@@ -238,7 +269,8 @@
 
 <script>
 import FmUpload from "./Upload";
-
+import { getInputValue , delcommafy} from '../util/comother.js'
+import {InputMoney} from '../util/amtUtil';
 export default {
   props: ["widget", "models", "rules", "remote"],    // widget为当前组件json数据
   components: {
@@ -246,6 +278,7 @@ export default {
   },
   data() {
     return {
+      amountvisible:false, // 控制金额放大镜的显隐
       dataModel: this.models[this.widget.model],   // 当前组件的默认值，是双向绑定的
     };
   },
@@ -294,7 +327,41 @@ export default {
     // textarea ctrl+enter事件
     areaHandel(e){
       this.$emit("text-enter",this)
-    }
+    },
+      blurHandler() {
+          this.amountvisible = false;
+      },
+      inputHandler(refId) {
+          const keyType = event.type;
+          const keyCode = event.keyCode;
+          // console.log('event.keyType',event.type);
+          // console.log('event.keyCode',event.keyCode);
+
+          if(keyType == 'keydown' && keyCode =='13'){
+              console.log("这是一个enter键操作...")
+              const refsId = this.$refs[refId];
+              this.dataModel  = delcommafy(refsId.value);
+          }else{
+              this.amountvisible = !!this.dataModel;
+              let amountObj = getInputValue(this.models[this.widget.model]);
+              this.bigPastAdjustFee = amountObj.bigPastAdjustFee;
+              if (typeof refId == 'string') {
+                  const refsId = this.$refs[refId];
+                  // console.log('refsid',refsId)
+                  // refsId._dot = 2;
+                  refsId.maxLength = 12;
+                  InputMoney(refsId);
+              }
+          }
+      },
+      keyupHandler(refId){
+          if (typeof refId == 'string') {
+              const refsId = this.$refs[refId];
+              // console.log('value',refsId.value)
+              this.dataModel  = refsId.value;
+              this.amountvisible = !!this.dataModel;
+          }
+      },
   },
   watch: {
     dataModel: {
@@ -319,3 +386,27 @@ export default {
   }
 };
 </script>
+<style lang="scss" scoped>
+    .mglass{
+        color: #fff;
+        padding: 10px;
+        font-size: 13px;
+        border: 1px solid #55a532;
+        background: #55a532;
+        .mglass-data {
+            font-size: 20px;
+            color: yellow;
+            font-weight: bold
+        }
+        .mglass-big {
+
+        }
+    }
+
+    .fade-enter-active, .fade-leave-active {
+        transition: opacity .5s;
+    }
+    .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+        opacity: 0;
+    }
+</style>
