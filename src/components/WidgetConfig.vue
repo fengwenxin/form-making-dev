@@ -67,6 +67,10 @@
       <el-form-item :label="$t('fm.config.widget.assignment')" v-if="data.type!='grid'">
         <el-button @click="handelMirror">点击编写赋值操作</el-button>
       </el-form-item>
+      <!-- 取值范围 -->
+      <el-form-item :label="$t('fm.config.widget.valueRange')" v-if="data.type!='grid'">
+        <el-input v-model="data.valueRange"></el-input>
+      </el-form-item>
       <el-form-item :label="$t('fm.config.widget.showAlpha')" v-if="Object.keys(data.options).indexOf('showAlpha')>=0">
         <el-switch
             v-model="data.options.showAlpha"

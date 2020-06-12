@@ -299,6 +299,37 @@ export default {
     handelAssignment() {
       this.evalWrap(this.data.list[this.focusIndex].assignment);
     },
+    // 取值范围校验
+    handelRange(){
+      if(this.data.list[this.focusIndex].valueRange!="" && this.data.list[this.focusIndex].valueRange!=undefined ){
+        let range = this.data.list[this.focusIndex].valueRange;
+        let nowValue = this.models[this.data.list[this.focusIndex].model];
+        console.log(nowValue)
+        let result,resultType;
+        try {
+          result = eval(range)
+          resultType = Object.prototype.toString.call(result)
+        } catch (error) {
+          throw new Error("取值范围条件解析出错")
+        }
+        console.log(result)
+        if(resultType == "[object Array]"){
+          if(result.indexOf(nowValue)==-1){
+            console.log("不符合取值范围")
+            return false
+          }else{
+            return true
+          }
+        }else if(resultType == "[object RegExp]"){
+          result.test(nowValue)
+        }else if(resultType == "[object String]"){
+          let resultReg = new RegExp(result);
+          resultReg.test(nowValue)
+        }
+      }else{
+        return false
+      }
+    },
     // 全部可聚焦input节点下标加入一个全局数组维护
     getFocusEle() {
       this.canFocusInputArr = [];
@@ -353,6 +384,14 @@ export default {
     // 监听input组件发射的el-change事件
     onElChange(e) {
       this.getData().then((resolve) => {
+        console.log(this.handelRange())
+        if(!this.handelRange()){
+          console.log("不符合取值范围")
+          // 主动触发错误提示
+          this.$refs['generateForm'].fields[this.focusIndex].validateMessage = '不符合取值范围'
+          this.$refs['generateForm'].fields[this.focusIndex].validateState = 'error'
+          return false
+        } 
         // 无赋值条件和离开条件
         if (
           !this.data.list[this.focusIndex].assignment &&
