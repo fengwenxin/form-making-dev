@@ -24,7 +24,7 @@ export const basicComponents = [
       pattern: '',
       placeholder: '',
       disabled: false,
-      tips:"暂无提示信息"
+      tips:""
     }
   },
   {

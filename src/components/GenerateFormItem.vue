@@ -1,7 +1,15 @@
 <template>
   <el-form-item :label="widget.name" :prop="widget.model">
     <template v-if="widget.type == 'input'">
-      <!-- <div  class="cus-tips">{{widget.options.tips}}</div> -->
+      <!-- <el-popover
+        width="500"
+        placement="top-start"
+        trigger="hover"
+        v-if="!widget.options.disabled"
+        content="这是一段内容,这是一段内容,这是一段内容,这是一段内容。"
+        >
+        <el-button :style="{'border':'0'}" slot="reference" icon="el-icon-question"></el-button>
+      </el-popover> -->
       <el-input
         v-if="widget.options.dataType == 'number' || widget.options.dataType == 'integer' || widget.options.dataType == 'float'"
         type="number"
@@ -20,7 +28,7 @@
         :style="{width: widget.options.width}"
         @keyup.native.enter="change"
         :ref="widget.model"
-      ><el-button v-if="widget.options.tips" slot="prepend" icon="el-icon-question" @click="showTips(widget.options.tips)"></el-button></el-input>
+      ><el-button v-if="widget.options.showTips" @click="showTips(widget.options.tips)" slot="prepend" icon="el-icon-question"></el-button></el-input>
     </template>
     <template v-if="widget.type == 'hrinput'">
       <hr-input

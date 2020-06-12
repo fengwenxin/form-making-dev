@@ -71,6 +71,7 @@
       <el-form-item :label="$t('fm.config.widget.valueRange')" v-if="data.type!='grid'">
         <el-input v-model="data.valueRange"></el-input>
       </el-form-item>
+      
       <el-form-item :label="$t('fm.config.widget.showAlpha')" v-if="Object.keys(data.options).indexOf('showAlpha')>=0">
         <el-switch
             v-model="data.options.showAlpha"
@@ -317,11 +318,10 @@
         </el-form-item>
       </template>
       
-
       <template v-if="data.type != 'grid'">
         <el-form-item :label="$t('fm.config.widget.attribute')">
           <el-checkbox v-model="data.options.readonly" v-if="Object.keys(data.options).indexOf('readonly')>=0">{{$t('fm.config.widget.readonly')}}</el-checkbox>
-          <el-checkbox v-model="data.options.disabled" v-if="Object.keys(data.options).indexOf('disabled')>=0">{{$t('fm.config.widget.disabled')}}	</el-checkbox>
+          <el-checkbox v-model="data.options.disabled" :disabled="data.options.tips!=''" v-if="Object.keys(data.options).indexOf('disabled')>=0">{{$t('fm.config.widget.disabled')}}	</el-checkbox>
           <el-checkbox v-model="data.options.editable" v-if="Object.keys(data.options).indexOf('editable')>=0">{{$t('fm.config.widget.editable')}}</el-checkbox>
           <el-checkbox v-model="data.options.clearable" v-if="Object.keys(data.options).indexOf('clearable')>=0">{{$t('fm.config.widget.clearable')}} </el-checkbox>
           <el-checkbox v-model="data.options.arrowControl" v-if="Object.keys(data.options).indexOf('arrowControl')>=0">{{$t('fm.config.widget.arrowControl')}}</el-checkbox>
@@ -329,6 +329,12 @@
           <el-checkbox v-model="data.options.isEdit" v-if="Object.keys(data.options).indexOf('isEdit')>=0">{{$t('fm.config.widget.isEdit')}}</el-checkbox>
           
         </el-form-item>
+        <!-- 提示信息 -->
+      <el-form-item v-if="data.type =='input'" :label="$t('fm.config.widget.showTips')">
+        <span style="color: red">注意：禁用和提示信息为互斥项</span>
+        <el-input v-if="data.options.disabled" :disabled="data.options.disabled" placeholder="不可配置"></el-input>
+        <el-input v-else placeholder="输入提示信息" v-model="data.options.tips"></el-input>
+      </el-form-item>
         <el-form-item :label="$t('fm.config.widget.validate')">
           <div v-if="Object.keys(data.options).indexOf('required')>=0">
             <el-checkbox v-model="data.options.required">{{$t('fm.config.widget.required')}}</el-checkbox>

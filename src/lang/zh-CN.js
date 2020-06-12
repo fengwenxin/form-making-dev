@@ -81,6 +81,7 @@ export default {
         assignment: '离开赋值', //新增离开赋值
         hidden: '隐藏条件',     //新增隐藏条件
         valueRange: '取值范围', //新增取值范围
+        showTips: '提示信息',       //新增是否显示提示信息
         title: '字段属性',
         model: '字段标识',
         name: '标题',
