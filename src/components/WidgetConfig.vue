@@ -346,6 +346,13 @@
             <el-option value="hex" :label="$t('fm.config.widget.hex')"></el-option>
           </el-select>
 
+          <!--todo 金额精度-->
+          <template v-if="data.options.amountmoney==true">
+            <el-form-item :label="$t('fm.config.widget.point')">
+              <el-input-number v-model="data.options.decimal" :min="0" :max="3" size="mini" >{{$t('fm.config.widget.decimal')}}</el-input-number>
+            </el-form-item>
+          </template>
+
           <!--todo 确认密码字段-->
           <el-form-item :label="$t('fm.config.widget.confirm_field')" v-if="data.options.confirm_field || data.options.dataType=='againpassword'">
             <el-input v-model="data.options.confirm_field"></el-input>

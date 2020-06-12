@@ -2,9 +2,9 @@ export default {
   fm: {
     components: {
       nFields:{
-          password: '密码控件',
-          againpassword: '确认密码控件',
-          amount: '金额控件',
+          password: '密码',
+          againpassword: '确认密码',
+          amount: '金额',
       },
       fields: {
         hrinput: "华软input",
@@ -190,7 +190,8 @@ export default {
         validatorRequired: '必须填写',
         validatorType: '格式不正确',
         validatorPattern: '格式不匹配',
-          confirm_field:"确认字段"
+          confirm_field:"确认字段",
+          point:"小数点精度",
       }
     },
     upload: {
