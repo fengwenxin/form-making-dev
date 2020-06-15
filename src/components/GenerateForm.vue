@@ -1,5 +1,8 @@
 <template>
-  <div v-if="!isDataNull">
+  <!--<div v-if="!isDataNull">-->
+  <div>
+      canFocusInputArr:
+      {{canFocusInputArr}}
     <el-form
       ref="generateForm"
       label-suffix=":"
@@ -100,7 +103,10 @@ export default {
       intervalId: null, //定时器ID
     };
   },
-  mounted() {
+  created () {
+      this.generateModle(this.data.list)
+  },
+  mounted(){
     // 这个定时器主要是解决父组件异步传值，子组件生命周期获取不到数据的问题
     this.intervalId = setInterval(() => {
       if (!this.isDataNull) {
@@ -132,8 +138,13 @@ export default {
     },
     // 生成models、rules对象
     generateModle(genList) {
+
+        if(!genList){
+            return
+        }
+        console.log("========generateModle=========")
       for (let i = 0; i < genList.length; i++) {
-        this.dynamicData(genList[i]);
+          this.dyData && Object.keys(this.dyData) &&  this.dynamicData(genList[i]);
         if (genList[i].type === "grid") {
           genList[i].columns.forEach((item) => {
             this.generateModle(item.list);
@@ -198,6 +209,29 @@ export default {
               }),
             ];
           }
+
+            // 确认密码的校验
+            // console.log('genList[i]',genList[i])
+            const dataType = genList[i].options.dataType;
+            const confirm_field = genList[i].options.confirm_field;
+            if(dataType =='againpassword'){
+                var validatePass = (rule, value, callback) => {
+                    // console.log('this.models',JSON.stringify(_this.models));
+                    setTimeout(()=>{
+                        if(this.models[confirm_field]){
+                            if (value === '') {
+                                callback(new Error('请输入确认密码'));
+                            } else if (this.models[confirm_field] !== value ) {
+                                callback(new Error('两次输入密码不一致!'));
+                            } else {
+                                callback();
+                            }
+                        }
+                    },200)
+                };
+                this.rules[genList[i].model].push({ validator: validatePass, trigger: 'blur' })
+            }
+
         }
       }
     },
@@ -391,7 +425,7 @@ export default {
           this.$refs['generateForm'].fields[this.focusIndex].validateMessage = '不符合取值范围'
           this.$refs['generateForm'].fields[this.focusIndex].validateState = 'error'
           return false
-        } 
+        }
         // 无赋值条件和离开条件
         if (
           !this.data.list[this.focusIndex].assignment &&

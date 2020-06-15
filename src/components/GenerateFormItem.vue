@@ -1,7 +1,7 @@
 <template>
   <el-form-item :label="widget.name" :prop="widget.model">
-      <!--{{widget}}-->
-      {{rules}}
+    <!--widget: {{widget}}-->
+      <!--{{rules}}-->
       <!--金额控件-->
       <template v-if="widget.type == 'amount'">
           <!--放大镜-->
