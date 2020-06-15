@@ -36,27 +36,43 @@ export default {
     };
   },
   created() {
-    this.getConfigData(this.configdata);
-    this.setDynamicData()
-    this.getInputData()
+    // this.getConfigData(this.configdata);
+    // this.setDynamicData()
+    // this.getInputData()
+
+      // 1
+      this.getConfigData(this.configdata).then(response => {
+          this.jsonData = response;
+      }).catch(error => {
+          console.log(error);
+      })
+      // 2
+      const {platform,user} = this.setDynamicData();
+      this.dyData = {
+          platform,
+          user
+      }
+      // 3
+      this.formdata = this.getInputData();
+
   },
   methods: {
     // 获取表单配置信息
-    getConfigData(configdata) {
+      getConfigData(configdata) {
       if(configdata.list[0].input_config_code){
         let codeId = configdata.list[0].input_config_code;
-        request
+        return request
         .get("http://localhost:3000/from",{
           params:{
             id: codeId
           }
         })
-        .then(response => {
+        /*.then(response => {
           this.jsonData = response;
         })
         .catch(error => {
           console.log(error);
-        });
+        });*/
       }else{
         return false
       }
@@ -65,22 +81,29 @@ export default {
     getInputData(){
       try {
         let transObj = eval("("+this.configdata.list[0].input_config+")")()  //封装
-        this.formdata = transObj
+        // this.formdata = transObj
+         return transObj;
       } catch (error) {
         throw new Error("input_config解析出错")
       }
-      
+
     },
     // 动态数据获取
     setDynamicData(){
-      this.dyData.platform = this.configdata.platform
-      this.dyData.user = this.configdata.user
+      // this.dyData.platform = this.configdata.platform
+      // this.dyData.user = this.configdata.user
+        const platform = this.configdata.platform;
+        const user = this.configdata.user;
+        return {
+            platform,
+            user
+        }
     },
   }
 };
 </script>
 
-<style>
+<style lang="scss" scoped>
 .form-wrap {
   margin-top: 20px;
 }

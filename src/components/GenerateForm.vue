@@ -1,7 +1,10 @@
 <template>
-  <div v-if="!isDataNull">
-  <!--<div>-->
-    <el-form
+  <!--<div v-if="!isDataNull">-->
+  <div>
+      <!--data:{{data.config}} <br>-->
+      <!--models:{{models}} <br>-->
+      <!--rules:{{rules}} <br>-->
+    <el-form v-if="keysLength"
       ref="generateForm"
       label-suffix=":"
       :size="data.config.size"
@@ -88,6 +91,12 @@ export default {
    * dyData为公共区动态数据
    */
   props: ["data", "remote", "value", "insite", "dyData"],
+  computed: {
+    keysLength() {
+        // 解除报错
+        return Object.keys(this.data).length
+    }
+  },
   data() {
     return {
       isDataNull: true, // 判断props传入的data是否有真实数据
@@ -359,7 +368,8 @@ export default {
           resultReg.test(nowValue)
         }
       }else{
-        return false
+        return true
+        // return false
       }
     },
     // 全部可聚焦input节点下标加入一个全局数组维护
@@ -409,7 +419,7 @@ export default {
         }
         this.startIndex = i + 1;
         this.focusIndex = this.canFocusInputArr[i];
-        console.log(this.focusIndex);
+        console.log('this.focusIndex',this.focusIndex);
         break;
       }
     },
