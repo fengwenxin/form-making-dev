@@ -1,8 +1,6 @@
 <template>
-  <!--<div v-if="!isDataNull">-->
-  <div>
-      canFocusInputArr:
-      {{canFocusInputArr}}
+  <div v-if="!isDataNull">
+  <!--<div>-->
     <el-form
       ref="generateForm"
       label-suffix=":"

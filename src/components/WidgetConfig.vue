@@ -172,8 +172,36 @@
         </div>
       </el-form-item>
 
+      <el-form-item>
+        <!--高度自适应-->
+        <div v-if="data.type=='textarea'">
+          <el-checkbox v-model="data.options.textareaautosize">{{$t('fm.config.widget.textareaautosize')}}</el-checkbox>
+        </div>
+        <!--最大字数-->
+        <template v-if="data.type=='textarea' && data.options.textareaautosize==true" >
+          <div style="display: inline-block;width: 49%;">
+            <el-input type="number" v-model="data.options.textarealength"></el-input>
+          </div>
+          <span> {{$t('fm.config.widget.textarealength')}}</span>
+        </template>
+        <!--最小行数-->
+        <template v-if="data.type=='textarea'">
+          <div>
+            <el-input-number v-model="data.options.textarearowmin" :min="2" size="mini" ></el-input-number>
+            <span> {{$t('fm.config.widget.textarearowmin')}}</span>
+          </div>
+        </template>
+        <!--最大行数-->
+        <template v-if="data.type=='textarea'">
+          <div>
+            <el-input-number v-model="data.options.textarearowmax" :min="3" :max="10" size="mini" ></el-input-number>
+            <span> {{$t('fm.config.widget.textarearowmax')}}</span>
+          </div>
+        </template>
+      </el-form-item>
+
       <el-form-item :label="$t('fm.config.widget.defaultValue')" v-if="Object.keys(data.options).indexOf('defaultValue')>=0 && (data.type == 'textarea' || data.type == 'input' || data.type=='rate' || data.type=='color' || data.type=='switch')">
-        <el-input v-if="data.type=='textarea'" type="textarea" :rows="5" v-model="data.options.defaultValue"></el-input>
+        <el-input v-if="data.type=='textarea'" type="textarea" :rows="data.options.textarearows" v-model="data.options.defaultValue"></el-input>
         <el-input v-if="data.type=='input'" v-model="data.options.defaultValue"></el-input>
         <el-rate v-if="data.type == 'rate'" style="display:inline-block;vertical-align: middle;" :max="data.options.max" :allow-half="data.options.allowHalf" v-model="data.options.defaultValue"></el-rate>
         <el-button type="text" v-if="data.type == 'rate'" style="display:inline-block;vertical-align: middle;margin-left: 10px;" @click="data.options.defaultValue=0">{{$t('fm.actions.clear')}}</el-button>
