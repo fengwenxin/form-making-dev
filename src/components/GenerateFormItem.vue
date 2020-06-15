@@ -16,6 +16,7 @@
                      @keydown="inputHandler(widget.key)"
                      @focus="inputHandler(widget.key)"
                      @keyup="keyupHandler(widget.key)"
+                     @keyup.enter="enterHandler(widget.key)"
                      @blur="blurHandler()"
                      :ref="widget.key"
                      v-model="dataModel" type="text">
@@ -332,26 +333,20 @@ export default {
           this.amountvisible = false;
       },
       inputHandler(refId) {
-          const keyType = event.type;
-          const keyCode = event.keyCode;
+          // const keyType = event.type;
+          // const keyCode = event.keyCode;
           // console.log('event.keyType',event.type);
           // console.log('event.keyCode',event.keyCode);
 
-          if(keyType == 'keydown' && keyCode =='13'){
-              console.log("这是一个enter键操作...")
+          this.amountvisible = !!this.dataModel;
+          let amountObj = getInputValue(this.models[this.widget.model]);
+          this.bigPastAdjustFee = amountObj.bigPastAdjustFee;
+          if (typeof refId == 'string') {
               const refsId = this.$refs[refId];
-              this.dataModel  = delcommafy(refsId.value);
-          }else{
-              this.amountvisible = !!this.dataModel;
-              let amountObj = getInputValue(this.models[this.widget.model]);
-              this.bigPastAdjustFee = amountObj.bigPastAdjustFee;
-              if (typeof refId == 'string') {
-                  const refsId = this.$refs[refId];
-                  // console.log('refsid',refsId)
-                  // refsId._dot = 2;
-                  refsId.maxLength = 12;
-                  InputMoney(refsId);
-              }
+              // console.log('refsid',refsId)
+              // refsId._dot = 2;
+              refsId.maxLength = 12;
+              InputMoney(refsId);
           }
       },
       keyupHandler(refId){
@@ -361,6 +356,12 @@ export default {
               this.dataModel  = refsId.value;
               this.amountvisible = !!this.dataModel;
           }
+      },
+      enterHandler(refId){
+          console.log("这是一个enter键操作...")
+          const refsId = this.$refs[refId];
+          this.amountvisible = false;
+          this.dataModel  = delcommafy(refsId.value);
       },
   },
   watch: {
