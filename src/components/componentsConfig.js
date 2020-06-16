@@ -25,7 +25,8 @@ export const basicComponents = [
       placeholder: '',
       disabled: false,
       tips:""
-    }
+    },
+    remoteFactor:{}
   },
   {
     type: 'textarea',

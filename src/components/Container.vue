@@ -347,12 +347,21 @@ export default {
     },
     // 获取mirror输入的代码
     getCode(){
+      console.log(this.nowEle)
       if(this.modify=="点击编写隐藏条件"){
         this.nowEle.hidden = this.code;
       }else if (this.modify=="点击编写离开条件"){
         this.nowEle.condition = this.code;
       }else if (this.modify=="点击编写赋值操作"){
         this.nowEle.assignment = this.code;
+      }else if(this.modify=="点击配置外部条件访问"){
+        let tmp;
+        try {
+          tmp = eval("("+this.code+")")()
+        } catch (error) {
+          throw new Error(error)
+        }
+        this.nowEle.remoteFactor = tmp;
       }
       this.mirrorVisible = false
     },

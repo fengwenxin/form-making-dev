@@ -75,6 +75,7 @@
 <script>
 import GenetateFormItem from "./GenerateFormItem";
 import { loadJs } from "../util/index.js";
+import request from "../util/request.js";
 export default {
   name: "fm-generate-form",
   components: {
@@ -117,8 +118,8 @@ export default {
     // 动态数据处理函数
     dynamicData(targetdata) {
       // 动态数据赋值
-      let platform = this.dyData.platform;
-      let user = this.dyData.user;
+      var platform = this.dyData.platform;
+      var user = this.dyData.user;
       if (
         targetdata.options.defaultValue != "" &&
         targetdata.options.defaultValue[0] == "@"
@@ -130,7 +131,25 @@ export default {
           throw new Error(error);
         }
         if (tempJson != "" || tempJson != null) {
+          console.log(tempJson);
           targetdata.options.defaultValue = tempJson;
+        }
+      }
+    },
+    // 处理流控数据中带有的动态数据
+    handelDynamicInFlow() {
+      var platform = this.dyData.platform;
+      var user = this.dyData.user;
+      for (let key in this.value) {
+        if (this.value[key].indexOf("platform")!=-1 || this.value[key].indexOf("user")!=-1) {
+          try {
+            var tempJson = eval(this.value[key]);
+          } catch (error) {
+            throw new Error(error);
+          }
+          if (tempJson != "" || tempJson != null) {
+            this.models[key] = tempJson;
+          }
         }
       }
     },
@@ -204,6 +223,7 @@ export default {
           }
         }
       }
+      this.handelDynamicInFlow()
     },
     // 验证并获取输入框当前的值
     getData() {
@@ -225,23 +245,11 @@ export default {
     },
     // 数据初始化完成后流程控制操作
     flowHandel() {
-      this.handelHide();
+      this.handelElement();
       this.allItems = document.querySelectorAll(".el-form-item");
       this.getFocusEle();
       this.handelFocus();
     },
-    // 运行时显隐控制
-    // handelHide() {
-    //   if (this.data.list[this.focusIndex].hidden && this.data.list[this.focusIndex].hidden!="") {
-    //     let hide = this.evalWrap(this.data.list[this.focusIndex].hidden);
-    //     console.log(hide);
-    //     if (hide) {
-    //       console.log("handelHide");
-    //       this.haveHide = true;
-    //       this.data.list[this.focusIndex].options.hidden = true;
-    //     }
-    //   }
-    // },
     // 监听表单数据改变
     onInputChange(value, field) {
       // 向container组件发射on-change事件，将 key value 以及models（form表单的key value对象）传入
@@ -276,6 +284,11 @@ export default {
       }
       return result;
     },
+    // 隐藏并获取可聚焦元素
+    handelElement() {
+      this.handelHide();
+      this.getFocusEle();
+    },
     // 隐藏条件判断
     handelHide() {
       for (let i = 0; i < this.data.list.length; i++) {
@@ -289,18 +302,26 @@ export default {
           }
         }
       }
-      this.getFocusEle()
+      this.getFocusEle();
     },
     // 离开条件检测
     handelCondition() {
       let condition = this.evalWrap(this.data.list[this.focusIndex].condition);
-      console.log(this.data.list[this.focusIndex].condition)
+      console.log(this.data.list[this.focusIndex].condition);
       if (condition) {
-        this.handelHide();
+        this.handelElement();
         this.handelFocus();
-      }else{
-        this.$refs['generateForm'].fields[this.focusIndex].validateMessage = '不满足离开条件'
-        this.$refs['generateForm'].fields[this.focusIndex].validateState = 'error'
+      } else {
+        this.handelValidate("error", "不满足离开条件");
+      }
+    },
+    // 手动触发校验提示函数
+    handelValidate(statu, msg) {
+      this.$refs["generateForm"].fields[this.focusIndex].validateState = statu;
+      if (statu == "error") {
+        this.$refs["generateForm"].fields[
+          this.focusIndex
+        ].validateMessage = msg;
       }
     },
     // 离开赋值
@@ -308,34 +329,69 @@ export default {
       this.evalWrap(this.data.list[this.focusIndex].assignment);
     },
     // 取值范围校验
-    handelRange(){
-      if(this.data.list[this.focusIndex].valueRange!="" && this.data.list[this.focusIndex].valueRange!=undefined ){
+    handelRange() {
+      if (
+        this.data.list[this.focusIndex].valueRange != "" &&
+        this.data.list[this.focusIndex].valueRange != undefined
+      ) {
         let range = this.data.list[this.focusIndex].valueRange;
         let nowValue = this.models[this.data.list[this.focusIndex].model];
-        console.log(nowValue)
-        let result,resultType;
+        console.log(nowValue);
+        let result, resultType;
         try {
-          result = eval(range)
-          resultType = Object.prototype.toString.call(result)
+          result = eval(range);
+          resultType = Object.prototype.toString.call(result);
         } catch (error) {
-          throw new Error("取值范围条件解析出错")
+          throw new Error("取值范围条件解析出错");
         }
-        console.log(result)
-        if(resultType == "[object Array]"){
-          if(result.indexOf(nowValue)==-1){
-            console.log("不符合取值范围")
-            return false
-          }else{
-            return true
+        console.log(result);
+        if (resultType == "[object Array]") {
+          if (result.indexOf(nowValue) == -1) {
+            console.log("不符合取值范围");
+            return false;
+          } else {
+            return true;
           }
-        }else if(resultType == "[object RegExp]"){
-          result.test(nowValue)
-        }else if(resultType == "[object String]"){
+        } else if (resultType == "[object RegExp]") {
+          result.test(nowValue);
+        } else if (resultType == "[object String]") {
           let resultReg = new RegExp(result);
-          resultReg.test(nowValue)
+          resultReg.test(nowValue);
         }
-      }else{
-        return true
+      } else {
+        return true;
+      }
+    },
+    // 访问外部条件
+    remoteValidate() {
+      if (this.data.list[this.focusIndex].remoteFactor != undefined) {
+        let url = this.data.list[this.focusIndex].remoteFactor.url;
+        let data = this.data.list[this.focusIndex].remoteFactor.data;
+        let success = this.data.list[this.focusIndex].remoteFactor.success;
+        request
+          .post(url, {
+            data: data,
+          })
+          .then((res) => {
+            if (res.code == 0) {
+              // 提取返回数据对象名
+              let targetKeys = Object.keys(res.data);
+              console.log(this.models);
+              // 解析返回数据对应的属性名并赋值对应组件
+              for (let i = 0; i < targetKeys.length; i++) {
+                if (this.models[targetKeys[i]] != undefined) {
+                  this.models[targetKeys[i]] = res.data[targetKeys[i]];
+                }
+              }
+              this.evalWrap(success);
+              this.handelValidate("success");
+            } else {
+              this.handelValidate("error", "验证不通过，请重新验证");
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          });
       }
     },
     // 全部可聚焦input节点下标加入一个全局数组维护
@@ -392,21 +448,21 @@ export default {
     // 监听input组件发射的el-change事件
     onElChange(e) {
       this.getData().then((resolve) => {
-        console.log(this.handelRange())
-        if(!this.handelRange()){
-          console.log("不符合取值范围")
+        if (!this.handelRange()) {
           // 主动触发错误提示
-          this.$refs['generateForm'].fields[this.focusIndex].validateMessage = '不符合取值范围'
-          this.$refs['generateForm'].fields[this.focusIndex].validateState = 'error'
-          return false
-        } 
+          this.handelValidate("error", "不符合取值范围");
+          return false;
+        } else {
+          this.handelValidate("success");
+        }
+        this.remoteValidate();
         // 无赋值条件和离开条件
         if (
           !this.data.list[this.focusIndex].assignment &&
           !this.data.list[this.focusIndex].condition
         ) {
           console.log("none");
-          this.handelHide();
+          this.handelElement();
           this.handelFocus();
         } else if (
           // 有赋值无离开条件
@@ -415,7 +471,7 @@ export default {
         ) {
           console.log("assignment");
           this.handelAssignment();
-          this.handelHide();
+          this.handelElement();
           this.handelFocus();
         } else if (
           this.data.list[this.focusIndex].condition != "" &&
@@ -436,6 +492,7 @@ export default {
       });
       this.$emit("input-enter");
     },
+    // textarea ctrl+enter触发光标离开事件
     textEnter() {
       this.handelFocus();
     },

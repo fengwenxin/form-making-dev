@@ -78,10 +78,12 @@ export default {
       },
       widget: {
         condition: '离开条件',  //新增离开条件
+        //outTips: '离开错误提示', //新增离开错误提示
         assignment: '离开赋值', //新增离开赋值
         hidden: '隐藏条件',     //新增隐藏条件
         valueRange: '取值范围', //新增取值范围
         showTips: '提示信息',       //新增是否显示提示信息
+        remoteFactor: '访问外部条件', //新增控件访问外部条件
         title: '字段属性',
         model: '字段标识',
         name: '标题',

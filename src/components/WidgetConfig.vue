@@ -63,9 +63,16 @@
       <el-form-item :label="$t('fm.config.widget.condition')" v-if="data.type!='grid'">
         <el-button @click="handelMirror">点击编写离开条件</el-button>
       </el-form-item>
+      <!-- <el-form-item :label="$t('fm.config.widget.outTips')" v-if="data.type!='grid'">
+        <el-input v-model="data.outTips" placeholder="请输入离开错误提示信息"></el-input>
+      </el-form-item> -->
       <!-- 离开赋值 -->
       <el-form-item :label="$t('fm.config.widget.assignment')" v-if="data.type!='grid'">
         <el-button @click="handelMirror">点击编写赋值操作</el-button>
+      </el-form-item>
+      <!-- 访问外部条件 -->
+      <el-form-item :label="$t('fm.config.widget.remoteFactor')" v-if="data.type!='grid'">
+        <el-button @click="handelMirror">点击配置外部条件访问</el-button>
       </el-form-item>
       <!-- 取值范围 -->
       <el-form-item :label="$t('fm.config.widget.valueRange')" v-if="data.type!='grid'">

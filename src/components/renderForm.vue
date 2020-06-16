@@ -9,7 +9,7 @@
 function input_config_EE() {
   return {
     amount: '流控数据',
-    transferType: 'flow.platform.transferType',
+    transferType: 'platform.transferType',
     user: '622002'
   }
 }
