@@ -78,6 +78,18 @@
         :ref="widget.model"
       ><el-button v-if="widget.options.tips!=''" @click="showTips(widget.options.tips)" slot="prepend" icon="el-icon-question"></el-button></el-input>
     </template>
+
+    <!--身份证-->
+    <template v-if="widget.type == 'idencard'">
+      <el-input
+              :type="widget.options.dataType"
+              v-model="dataModel"
+              :disabled="widget.options.disabled"
+              :placeholder="widget.options.placeholder"
+              :style="{width: widget.options.width}"
+      ><el-button slot="prepend" icon="el-icon-question" @click="indentcart()"></el-button></el-input>
+    </template>
+
     <template v-if="widget.type == 'hrinput'">
       <hr-input
         :type="widget.options.type"
@@ -446,13 +458,21 @@ export default {
       blurHandler() {
           this.amountvisible = false;
       },
+      async indentcart() {
+          this.dataModel = "";
+          const idenTemp = await smartClient.allDevice('GNQ_04','')
+          if(idenTemp){
+              const idenTempObj = JSON.parse(idenTemp);
+              if(idenTempObj.rCode == 0){
+                  this.dataModel = idenTempObj.idInfo.IDNumber
+              }else{
+                  alert("检测失败：" + idenTemp)
+              }
+          }else{
+              alert("无")
+          }
+      },
       inputHandler(refId) {
-          /*alert("1")
-          axios.get('/smartClient.allDevice?para1=GNQ_04&para2=')
-          .then(function (response) {
-              console.log(response);
-          })*/
-
           // const keyType = event.type;
           // const keyCode = event.keyCode;
           // console.log('event.keyType',event.type);

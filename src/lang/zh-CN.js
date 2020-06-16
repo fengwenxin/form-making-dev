@@ -12,6 +12,7 @@ export default {
           select: '下拉框',
           radio: '单选框',
           checkbox: '多选框',
+          idencard: '身份证',
       },
       fields: {
         hrinput: "华软input",

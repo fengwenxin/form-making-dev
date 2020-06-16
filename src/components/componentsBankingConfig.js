@@ -209,7 +209,22 @@ export const bankingComponents = [
             remoteFunc: ''
         }
     },
-
+    {
+        type: 'idencard',
+        icon: 'icon-input',
+        options: {
+            hidden: false,
+            width: '100%',
+            defaultValue: '',
+            required: false,
+            dataType: 'string',
+            decimal: '',
+            pattern: '',
+            placeholder: '',
+            disabled: false,
+            tips:"暂无提示信息"
+        }
+    },
 ]
 
 
