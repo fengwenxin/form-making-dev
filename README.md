@@ -3,7 +3,7 @@
 #### Description
 formmaking渲染引擎二次开发
 
-#### 使用方法
+#### 使用方法test
 
 1.  npm install 安装
 2.  引入<render-from :configdata="configdata"></render-from>组件

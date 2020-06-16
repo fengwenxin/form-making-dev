@@ -1,6 +1,10 @@
 <template>
   <div v-if="!isDataNull">
-    <el-form
+  <!--<div>-->
+      <!--data:{{data.config}} <br>-->
+      <!--models:{{models}} <br>-->
+      <!--rules:{{rules}} <br>-->
+    <el-form v-if="keysLength"
       ref="generateForm"
       label-suffix=":"
       :size="data.config.size"
@@ -88,6 +92,12 @@ export default {
    * dyData为公共区动态数据
    */
   props: ["data", "remote", "value", "insite", "dyData"],
+  computed: {
+    keysLength() {
+        // 解除报错
+        return Object.keys(this.data).length
+    }
+  },
   data() {
     return {
       isDataNull: true, // 判断props传入的data是否有真实数据
@@ -105,7 +115,10 @@ export default {
   // created(){
   //   this.generateModle(this.data.list)
   // },
-  mounted() {
+  created () {
+      this.generateModle(this.data.list)
+  },
+  mounted(){
     // 这个定时器主要是解决父组件异步传值，子组件生命周期获取不到数据的问题
     this.intervalId = setInterval(() => {
       if (!this.isDataNull) {
@@ -155,8 +168,13 @@ export default {
     },
     // 生成models、rules对象
     generateModle(genList) {
+
+        if(!genList){
+            return
+        }
+        console.log("========generateModle=========")
       for (let i = 0; i < genList.length; i++) {
-        this.dynamicData(genList[i]);
+          this.dyData && Object.keys(this.dyData) &&  this.dynamicData(genList[i]);
         if (genList[i].type === "grid") {
           genList[i].columns.forEach((item) => {
             this.generateModle(item.list);
@@ -221,6 +239,54 @@ export default {
               }),
             ];
           }
+
+            // 确认密码的校验
+            // console.log('genList[i]',genList[i])
+            const dataType = genList[i].options.dataType;
+            const confirm_field = genList[i].options.confirm_field;
+            if(dataType =='againpassword'){
+                var validatePass = (rule, value, callback) => {
+                    // console.log('this.models',JSON.stringify(_this.models));
+                    setTimeout(()=>{
+                        if(this.models[confirm_field]){
+                            if (value === '') {
+                                callback(new Error('请输入确认密码'));
+                            } else if (this.models[confirm_field] !== value ) {
+                                callback(new Error('两次输入密码不一致!'));
+                            } else {
+                                callback();
+                            }
+                        }
+                    },200)
+                };
+                this.rules[genList[i].model].push({ validator: validatePass, trigger: 'blur' })
+            }
+            if(dataType =='integer' || dataType =='float'){
+                var validatePass = (rule, value, callback) => {
+                    setTimeout(()=>{
+                        if (value && genList[i].options.integerbits) {
+                            if((value+"").indexOf(".") > -1){
+                                const temp = (value+"").split(".")
+                                if((temp[0]+"").length > genList[i].options.integerbits){
+                                    callback(new Error('超过整数位位数'));
+                                }
+                                if(genList[i].options.decimalbits && (temp[1]+"").length > genList[i].options.decimalbits){
+                                    callback(new Error('超过小数位位数'));
+                                }else{
+                                    callback();
+                                }
+                            }else{
+                                if((value+"").length > genList[i].options.integerbits){
+                                    callback(new Error('超过整数位位数'));
+                                }else{
+                                    callback();
+                                }
+                            }
+                        }
+                    },200)
+                };
+                this.rules[genList[i].model].push({ validator: validatePass, trigger: 'blur' })
+            }
         }
       }
       this.handelDynamicInFlow()
@@ -441,7 +507,7 @@ export default {
         }
         this.startIndex = i + 1;
         this.focusIndex = this.canFocusInputArr[i];
-        console.log(this.focusIndex);
+        console.log('this.focusIndex',this.focusIndex);
         break;
       }
     },

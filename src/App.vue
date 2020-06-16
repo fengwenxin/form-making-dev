@@ -4,12 +4,12 @@
       <img class="fm-logo" src="./assets/logo.png">
       <div class="fm-title" @click="handleHome">{{$t('header.title')}}</div>
 
-      <iframe style="vertical-align: middle;margin-top:10px;margin-left: 10px;" src="https://ghbtns.com/github-btn.html?user=GavinZhulei&repo=vue-form-making&type=star&count=true" frameborder="0" scrolling="0" width="160px" height="30px"></iframe>
+      <!--<iframe style="vertical-align: middle;margin-top:10px;margin-left: 10px;" src="https://ghbtns.com/github-btn.html?user=GavinZhulei&repo=vue-form-making&type=star&count=true" frameborder="0" scrolling="0" width="160px" height="30px"></iframe>-->
 
       <div class="fm-link">
         <a target="_blank" href="http://form.xiaoyaoji.cn/pricing">{{$t('header.pricing')}}</a>
         <a target="_blank" href="http://docs.form.xiaoyaoji.cn">{{$t('header.document')}}</a>
-        <a target="_blank" href="http://docs.form.xiaoyaoji.cn/zh/other/course.html" v-if="$lang == 'zh-CN'">学习课程</a> 
+        <a target="_blank" href="http://docs.form.xiaoyaoji.cn/zh/other/course.html" v-if="$lang == 'zh-CN'">学习课程</a>
         <a target="_blank" href="https://github.com/GavinZhuLei/vue-form-making">GitHub</a>
 
         <div class="action-item">
@@ -78,7 +78,7 @@ export default {
   .fm-link{
     height: 50px;
     float: right;
-    
+
     a{
       color: #fff;
       text-decoration: none;
@@ -86,7 +86,7 @@ export default {
       line-height: 50px;
       font-weight: 500;
       margin-left: 15px;
-      
+
       &:hover{
         opacity: 0.8;
       }

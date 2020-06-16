@@ -1,6 +1,18 @@
 export default {
   fm: {
     components: {
+      nFields:{
+          password: '密码',
+          againpassword: '确认密码',
+          amount: '金额',
+          input: '数字',
+          date: '日期',
+          time: '时间',
+          textarea: '多行文本',
+          select: '下拉框',
+          radio: '单选框',
+          checkbox: '多选框',
+      },
       fields: {
         hrinput: "华软input",
         input: '单行文本',
@@ -25,6 +37,9 @@ export default {
         grid: '栅格布局',
         tabs: '标签页',
         divider: '分割线'
+      },
+      banking:{
+        title:"金融组件"
       },
       basic: {
         title: '基础字段',
@@ -93,6 +108,10 @@ export default {
         labelWidth: '标签宽度',
         custom: '自定义',
         placeholder: '占位内容',
+        textareaautosize: '高度自适应',
+        textarealength: '最大字数',
+        textarearowmin: '最小行数',
+        textarearowmax: '最大行数',
         layout: '布局方式',
         block: '块级',
         inline: '行内',
@@ -138,6 +157,8 @@ export default {
         integer: '整数',
         float: '浮点数',
         url: 'URL地址',
+          password: '密码',
+          againpassword: '确认密码',
         email: '邮箱地址',
         hex: '十六进制',
         gutter: '栅格间隔',
@@ -159,8 +180,8 @@ export default {
         borderCard: '卡片化',
         tabPosition: '选项卡位置',
         top: '顶部',
-        left: '左侧',
-        right: '右侧',
+        // left: '左侧',
+        // right: '右侧',
         bottom: '底部',
         tabOption: '标签配置项',
         tabName: '标签名称',
@@ -182,8 +203,19 @@ export default {
         tab: '标签页',
         validatorRequired: '必须填写',
         validatorType: '格式不正确',
-        validatorPattern: '格式不匹配'
-      }
+        validatorPattern: '格式不匹配',
+          confirm_field:"确认字段",
+          point:"小数点精度",
+      },
+        integerpara: {
+            all: '全部',  //全部
+            pinteger: '正整数',  //正整数
+            pzinteger: '正整数+0',  //正整数+0
+            einteger: '负整数',  //负整数
+            ezinteger: '负整数+0',  //负整数+0
+            integerbits: '整数位位数',
+            decimalbits: '小数位位数',
+        }
     },
     upload: {
       preview: '预览',

@@ -30,7 +30,7 @@ export default new Router({
           component: Home
         },
         {
-          path: '/preview',
+          path: 'preview',
           name: 'preview',
           component: preview
         }

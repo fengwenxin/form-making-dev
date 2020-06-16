@@ -1,5 +1,52 @@
 <template>
   <el-form-item :label="widget.name" :prop="widget.model">
+    <!--widget: {{widget}}-->
+      <!--{{rules}}-->
+      <!--金额控件-->
+      <template v-if="widget.type == 'amount'">
+          <!--放大镜-->
+          <transition name="fade">
+              <div v-if="widget.options.amountmoney && amountvisible" class="mglass">
+                  <div class="mglass-data">{{dataModel}} <br></div>
+                  <div class="mglass-big">{{bigPastAdjustFee}}</div>
+              </div>
+          </transition>
+          <div class="el-input el-input--small">
+              <input class="el-input__inner"
+                     @keydown="inputHandler(widget.key)"
+                     @focus="inputHandler(widget.key)"
+                     @keyup="keyupHandler(widget.key)"
+                     @keyup.enter="enterHandler(widget.key)"
+                     @blur="blurHandler()"
+                     :ref="widget.key"
+                     v-model="dataModel" type="text">
+          </div>
+      </template>
+        <!--密码-->
+      <template v-if="widget.type == 'password'">
+          <el-input
+                  type="password"
+                  v-model="dataModel"
+                  :disabled="widget.options.disabled"
+                  :placeholder="widget.options.placeholder"
+                  :style="{width: widget.options.width}"
+                  @keyup.native.enter="change"
+                  :ref="widget.model"
+          ><el-button v-if="widget.options.tips" slot="prepend" icon="el-icon-question" @click="showTips(widget.options.tips)"></el-button></el-input>
+      </template>
+      <!--确认密码-->
+      <template v-if="widget.type == 'againpassword'">
+          <el-input
+                  type="password"
+                  v-model="dataModel"
+                  :disabled="widget.options.disabled"
+                  :placeholder="widget.options.placeholder"
+                  :style="{width: widget.options.width}"
+                  @keyup.native.enter="change"
+                  :ref="widget.model"
+          ><el-button v-if="widget.options.tips" slot="prepend" icon="el-icon-question" @click="showTips(widget.options.tips)"></el-button></el-input>
+      </template>
+
     <template v-if="widget.type == 'input'">
       <!-- <el-popover
         width="500"
@@ -18,6 +65,7 @@
         :style="{width: widget.options.width}"
         :disabled="widget.options.disabled"
       ></el-input>
+
       <!-- dataType为组件类型 dataModel为双向绑定的数据 -->
       <el-input
         v-else
@@ -43,11 +91,13 @@
     <template v-if="widget.type == 'textarea'">
       <el-input
         type="textarea"
-        :rows="5"
+        :autosize="widget.options.textareaautosize ? { minRows: widget.options.textarearowmin, maxRows: widget.options.textarearowmax} : ''"
+        :maxlength="widget.options.textarealength"
         v-model="dataModel"
         :disabled="widget.options.disabled"
         :placeholder="widget.options.placeholder"
         :style="{width: widget.options.width}"
+        show-word-limit
         @keyup.native.ctrl.enter="areaHandel"
       ></el-input>
     </template>
@@ -65,11 +115,13 @@
 
     <template v-if="widget.type == 'radio'">
       <el-radio-group
+              @click.native="radioFun"
         v-model="dataModel"
         :style="{width: widget.options.width}"
         :disabled="widget.options.disabled"
       >
         <el-radio
+            @keydown.space.native="radioFun"
           :style="{display: widget.options.inline ? 'inline-block' : 'block'}"
           :label="item.value"
           v-for="(item, index) in (widget.options.remote ? widget.options.remoteOptions : widget.options.options)"
@@ -81,11 +133,33 @@
       </el-radio-group>
     </template>
 
+      <!--radio-->
+      <cus-dialog
+              :visible="radioVisible"
+              @on-close="radioVisible = false"
+              ref="radioPreview"
+              width="500px"
+              form
+      >
+          <radioFormItem insite="true" v-if="radioVisible" @on-close1="radioVisibleFun" :models.sync="models" :widget="widget"  ref="radioForm">
+
+              <template v-slot:blank="scope">
+                  Width <el-input v-model="scope.model.blank.width" style="width: 100px"></el-input>
+                  Height <el-input v-model="scope.model.blank.height" style="width: 100px"></el-input>
+              </template>
+          </radioFormItem>
+
+          <template slot="action">
+              <span></span>
+          </template>
+      </cus-dialog>
+
     <template v-if="widget.type == 'checkbox'">
       <el-checkbox-group
         v-model="dataModel"
         :style="{width: widget.options.width}"
         :disabled="widget.options.disabled"
+
       >
         <el-checkbox
           :style="{display: widget.options.inline ? 'inline-block' : 'block'}"
@@ -131,6 +205,7 @@
         :value-format="widget.options.timestamp ? 'timestamp' : widget.options.format"
         :format="widget.options.format"
         :style="{width: widget.options.width}"
+        v-bind:picker-options="widget.options.type == 'date' ? pickerOptionsDate : (widget.options.type == 'daterange' ? pickerOptionsRange :'') "
         @keyup.native.enter="change"
       ></el-date-picker>
     </template>
@@ -166,9 +241,12 @@
           v-for="item in (widget.options.remote ? widget.options.remoteOptions : widget.options.options)"
           :key="item.value"
           :value="item.value"
-          :label="widget.options.showLabel || widget.options.remote?item.label:item.value"
-        ></el-option>
+          :label="widget.options.showLabel || widget.options.remote?item.label:item.value">
+          <span style="float: left">{{ widget.options.showLabel || widget.options.remote?item.label:item.value }}</span>
+          <span style="float: right; color: #8492a6; font-size: 13px">{{ item.value }}</span>
+        </el-option>
       </el-select>
+        <span>{{dataModel}}</span>
     </template>
 
     <template v-if="widget.type=='switch'">
@@ -230,15 +308,75 @@
 
 <script>
 import FmUpload from "./Upload";
-
+import CusDialog from './CusDialog'
+import radioFormItem from './radioFormItem'
+import { getInputValue , delcommafy} from '../util/comother.js'
+import {InputMoney} from '../util/amtUtil';
+import request from "../util/request.js";
 export default {
   props: ["widget", "models", "rules", "remote"],    // widget为当前组件json数据
   components: {
-    FmUpload
+    FmUpload,
+    CusDialog,
+    radioFormItem
   },
   data() {
     return {
+        radioVisible:false,
+      amountvisible:false, // 控制金额放大镜的显隐
       dataModel: this.models[this.widget.model],   // 当前组件的默认值，是双向绑定的
+        pickerOptionsDate: {
+            disabledDate(time) {
+                return time.getTime() > Date.now();
+            },
+            shortcuts: [{
+                text: '今天',
+                onClick(picker) {
+                    picker.$emit('pick', new Date());
+                }
+            }, {
+                text: '昨天',
+                onClick(picker) {
+                    const date = new Date();
+                    date.setTime(date.getTime() - 3600 * 1000 * 24);
+                    picker.$emit('pick', date);
+                }
+            }, {
+                text: '一周前',
+                onClick(picker) {
+                    const date = new Date();
+                    date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+                    picker.$emit('pick', date);
+                }
+            }]
+        },
+        pickerOptionsRange: {
+            shortcuts: [{
+                text: '最近一周',
+                onClick(picker) {
+                    const end = new Date();
+                    const start = new Date();
+                    start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                    picker.$emit('pick', [start, end]);
+                }
+            }, {
+                text: '最近一个月',
+                onClick(picker) {
+                    const end = new Date();
+                    const start = new Date();
+                    start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+                    picker.$emit('pick', [start, end]);
+                }
+            }, {
+                text: '最近三个月',
+                onClick(picker) {
+                    const end = new Date();
+                    const start = new Date();
+                    start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+                    picker.$emit('pick', [start, end]);
+                }
+            }]
+        },
     };
   },
   created() {
@@ -266,6 +404,24 @@ export default {
     }
   },
   methods: {
+      radioVisibleFun(){
+          //console.log("111-------------------")
+          this.radioVisible = false
+
+      },
+
+      radioFun () {
+          const keyType = event.type;
+          const keyCode = event.keyCode;
+          //console.log(this.widget)
+          debugger
+          if(keyType == 'keydown' && keyCode =='32'){
+              console.log("这是一个space键操作......")
+              this.radioVisible = true
+          }else if(keyType == 'click'){
+              this.radioVisible = true
+          }
+      },
     focus(){
       // this.$on("focus",function(){
       //   focus()
@@ -286,7 +442,47 @@ export default {
     // textarea ctrl+enter事件
     areaHandel(e){
       this.$emit("text-enter",this)
-    }
+    },
+      blurHandler() {
+          this.amountvisible = false;
+      },
+      inputHandler(refId) {
+          /*alert("1")
+          axios.get('/smartClient.allDevice?para1=GNQ_04&para2=')
+          .then(function (response) {
+              console.log(response);
+          })*/
+
+          // const keyType = event.type;
+          // const keyCode = event.keyCode;
+          // console.log('event.keyType',event.type);
+          // console.log('event.keyCode',event.keyCode);
+
+          this.amountvisible = !!this.dataModel;
+          let amountObj = getInputValue(this.models[this.widget.model]);
+          this.bigPastAdjustFee = amountObj.bigPastAdjustFee;
+          if (typeof refId == 'string') {
+              const refsId = this.$refs[refId];
+              // console.log('refsid',refsId)
+              // refsId._dot = 2;
+              refsId.maxLength = 12;
+              InputMoney(refsId);
+          }
+      },
+      keyupHandler(refId){
+          if (typeof refId == 'string') {
+              const refsId = this.$refs[refId];
+              // console.log('value',refsId.value)
+              this.dataModel  = refsId.value;
+              this.amountvisible = !!this.dataModel;
+          }
+      },
+      enterHandler(refId){
+          console.log("这是一个enter键操作...")
+          const refsId = this.$refs[refId];
+          this.amountvisible = false;
+          this.dataModel  = delcommafy(refsId.value);
+      },
   },
   watch: {
     dataModel: {
@@ -311,3 +507,27 @@ export default {
   }
 };
 </script>
+<style lang="scss" scoped>
+    .mglass{
+        color: #fff;
+        padding: 10px;
+        font-size: 13px;
+        border: 1px solid #55a532;
+        background: #55a532;
+        .mglass-data {
+            font-size: 20px;
+            color: yellow;
+            font-weight: bold
+        }
+        .mglass-big {
+
+        }
+    }
+
+    .fade-enter-active, .fade-leave-active {
+        transition: opacity .5s;
+    }
+    .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+        opacity: 0;
+    }
+</style>
