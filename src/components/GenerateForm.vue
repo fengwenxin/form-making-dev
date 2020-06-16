@@ -80,6 +80,8 @@
 import GenetateFormItem from "./GenerateFormItem";
 import { loadJs } from "../util/index.js";
 import request from "../util/request.js";
+import {IdentityCodeValid} from '../util/idencardUtil';
+
 export default {
   name: "fm-generate-form",
   components: {
@@ -261,6 +263,7 @@ export default {
                 };
                 this.rules[genList[i].model].push({ validator: validatePass, trigger: 'blur' })
             }
+            //整数和数字类型     整数位、小数位位数
             if(dataType =='integer' || dataType =='float'){
                 var validatePass = (rule, value, callback) => {
                     setTimeout(()=>{
@@ -282,6 +285,19 @@ export default {
                                     callback();
                                 }
                             }
+                        }
+                    },200)
+                };
+                this.rules[genList[i].model].push({ validator: validatePass, trigger: 'blur' })
+            }
+            //身份证校验
+            if(genList[i].type =='idencard'){
+                var validatePass = (rule, value, callback) => {
+                    setTimeout(()=>{
+                        if (value && IdentityCodeValid(value)) {
+                            callback();
+                        }else{
+                            callback(new Error('身份证验证错误'));
                         }
                     },200)
                 };

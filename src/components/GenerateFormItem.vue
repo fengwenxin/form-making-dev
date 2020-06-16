@@ -87,7 +87,7 @@
               :disabled="widget.options.disabled"
               :placeholder="widget.options.placeholder"
               :style="{width: widget.options.width}"
-      ><el-button slot="prepend" icon="el-icon-question" @click="indentcart()"></el-button></el-input>
+      ><el-button v-if="widget.options.ifperipheral" slot="prepend" icon="el-icon-question" @click="indentcart()">读取</el-button></el-input>
     </template>
 
     <template v-if="widget.type == 'hrinput'">
@@ -455,39 +455,40 @@ export default {
     areaHandel(e){
       this.$emit("text-enter",this)
     },
-      blurHandler() {
-          this.amountvisible = false;
-      },
-      async indentcart() {
-          this.dataModel = "";
-          const idenTemp = await smartClient.allDevice('GNQ_04','')
-          if(idenTemp){
-              const idenTempObj = JSON.parse(idenTemp);
-              if(idenTempObj.rCode == 0){
-                  this.dataModel = idenTempObj.idInfo.IDNumber
-              }else{
-                  alert("检测失败：" + idenTemp)
-              }
-          }else{
-              alert("无")
-          }
-      },
-      inputHandler(refId) {
-          // const keyType = event.type;
-          // const keyCode = event.keyCode;
-          // console.log('event.keyType',event.type);
-          // console.log('event.keyCode',event.keyCode);
+    blurHandler() {
+        this.amountvisible = false;
+    },
+      //身份证
+    async indentcart() {
+        this.dataModel = "";
+        const idenTemp = await smartClient.allDevice('GNQ_04','')
+        if(idenTemp){
+            const idenTempObj = JSON.parse(idenTemp);
+            if(idenTempObj.rCode == 0){
+                this.dataModel = idenTempObj.idInfo.IDNumber
+            }else{
+                alert("检测失败：" + idenTemp)
+            }
+        }else{
+            alert("无")
+        }
+    },
+    inputHandler(refId) {
+        // const keyType = event.type;
+        // const keyCode = event.keyCode;
+        // console.log('event.keyType',event.type);
+        // console.log('event.keyCode',event.keyCode);
 
-          this.amountvisible = !!this.dataModel;
-          let amountObj = getInputValue(this.models[this.widget.model]);
-          this.bigPastAdjustFee = amountObj.bigPastAdjustFee;
-          if (typeof refId == 'string') {
-              const refsId = this.$refs[refId];
-              // console.log('refsid',refsId)
-              // refsId._dot = 2;
-              refsId.maxLength = 12;
-              InputMoney(refsId);
-          }
+        this.amountvisible = !!this.dataModel;
+        let amountObj = getInputValue(this.models[this.widget.model]);
+        this.bigPastAdjustFee = amountObj.bigPastAdjustFee;
+        if (typeof refId == 'string') {
+            const refsId = this.$refs[refId];
+            // console.log('refsid',refsId)
+            // refsId._dot = 2;
+            refsId.maxLength = 12;
+            InputMoney(refsId);
+        }
       },
       keyupHandler(refId){
           if (typeof refId == 'string') {

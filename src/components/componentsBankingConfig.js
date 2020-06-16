@@ -217,6 +217,8 @@ export const bankingComponents = [
             width: '100%',
             defaultValue: '',
             required: false,
+            ifperipheral: true,
+            onlinecheck: false,
             dataType: 'string',
             decimal: '',
             pattern: '',

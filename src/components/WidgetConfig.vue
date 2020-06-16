@@ -48,6 +48,17 @@
         <el-switch v-model="data.options.filterable"></el-switch>
       </el-form-item>
 
+      <el-form-item>
+        <!--是否支持外设-->
+        <div v-if="data.type=='idencard'">
+          <el-checkbox v-model="data.options.ifperipheral">{{$t('fm.config.widget.ifperipheral')}}</el-checkbox>
+        </div>
+        <!--是否支持外设-->
+        <div v-if="data.type=='idencard'">
+          <el-checkbox v-model="data.options.onlinecheck">{{$t('fm.config.widget.onlinecheck')}}</el-checkbox>
+        </div>
+      </el-form-item>
+
       <el-form-item label="$t('fm.config.widget.allowHalf')" v-if="Object.keys(data.options).indexOf('allowHalf')>=0">
         <el-switch
             v-model="data.options.allowHalf"

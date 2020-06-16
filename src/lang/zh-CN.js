@@ -109,6 +109,8 @@ export default {
         labelWidth: '标签宽度',
         custom: '自定义',
         placeholder: '占位内容',
+        ifperipheral: '支持外设',
+        onlinecheck: '联网核查',
         textareaautosize: '高度自适应',
         textarealength: '最大字数',
         textarearowmin: '最小行数',
