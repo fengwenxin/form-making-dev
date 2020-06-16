@@ -5,6 +5,7 @@ export default {
           password: '密码',
           againpassword: '确认密码',
           amount: '金额',
+          input: '数字',
           date: '日期',
           time: '时间',
           textarea: '多行文本',
@@ -202,7 +203,16 @@ export default {
         validatorPattern: '格式不匹配',
           confirm_field:"确认字段",
           point:"小数点精度",
-      }
+      },
+        integerpara: {
+            all: '全部',  //全部
+            pinteger: '正整数',  //正整数
+            pzinteger: '正整数+0',  //正整数+0
+            einteger: '负整数',  //负整数
+            ezinteger: '负整数+0',  //负整数+0
+            integerbits: '整数位位数',
+            decimalbits: '小数位位数',
+        }
     },
     upload: {
       preview: '预览',

@@ -374,6 +374,25 @@
             <el-option value="hex" :label="$t('fm.config.widget.hex')"></el-option>
           </el-select>
 
+          <!--todo 整数自定义属性-->
+          <el-select v-if="data.options.dataType=='integer'" v-model="patternpara" size="mini" >
+            <el-option value="//" :label="$t('fm.config.integerpara.all')"></el-option>
+            <el-option value="/^[0-9]*[1-9][0-9]*$/" :label="$t('fm.config.integerpara.pinteger')"></el-option>
+            <el-option value="/^\d+$/" :label="$t('fm.config.integerpara.pzinteger')"></el-option>
+            <el-option value="/^-[0-9]*[1-9][0-9]*$/" :label="$t('fm.config.integerpara.einteger')"></el-option>
+            <el-option value="/^((-\d+)|(0+))$/" :label="$t('fm.config.integerpara.ezinteger')"></el-option>
+          </el-select>
+          <!--todo 整数位位数-->
+          <template v-if="data.options.dataType=='integer' | data.options.dataType=='float'">
+              <el-input-number v-model="data.options.integerbits" :min="1" :max="17" size="mini" :step="1">{{$t('fm.config.integerpara.integerbits')}}</el-input-number>
+              <label>{{$t('fm.config.integerpara.integerbits')}}</label>
+          </template>
+          <!--todo 小数位位数-->
+          <template v-if="data.options.dataType=='integer' | data.options.dataType=='float'">
+              <el-input-number v-model="data.options.decimalbits" :min="0" :max="3" value="1" size="mini" :step="1"></el-input-number>
+              <label>{{$t('fm.config.integerpara.decimalbits')}}</label>
+          </template>
+
           <!--todo 金额精度-->
           <template v-if="data.options.amountmoney==true">
             <el-form-item :label="$t('fm.config.widget.point')">
@@ -407,6 +426,7 @@ export default {
   props: ['data'],
   data () {
     return {
+      patternpara:'',
       validator: {
         type: null,
         required: null,
@@ -416,6 +436,11 @@ export default {
       }
     }
   },
+    created () {
+        /*this.$nextTick(()=>{
+            this.valiatePattern("/^\\d+$/" )
+        })*/
+    },
   computed: {
     show () {
       if (this.data && Object.keys(this.data).length > 0) {
@@ -523,6 +548,9 @@ export default {
     }
   },
   watch: {
+    'patternpara': function(val) {
+        this.data.options.pattern = val
+    },
     'data.options.isRange': function(val) {
       if (typeof val !== 'undefined') {
         if (val) {

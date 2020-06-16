@@ -304,6 +304,7 @@ import CusDialog from './CusDialog'
 import radioFormItem from './radioFormItem'
 import { getInputValue , delcommafy} from '../util/comother.js'
 import {InputMoney} from '../util/amtUtil';
+import request from "../util/request.js";
 export default {
   props: ["widget", "models", "rules", "remote"],    // widget为当前组件json数据
   components: {
@@ -438,6 +439,12 @@ export default {
           this.amountvisible = false;
       },
       inputHandler(refId) {
+          /*alert("1")
+          axios.get('/smartClient.allDevice?para1=GNQ_04&para2=')
+          .then(function (response) {
+              console.log(response);
+          })*/
+
           // const keyType = event.type;
           // const keyCode = event.keyCode;
           // console.log('event.keyType',event.type);

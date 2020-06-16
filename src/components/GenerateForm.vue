@@ -1,6 +1,6 @@
 <template>
-  <!--<div v-if="!isDataNull">-->
-  <div>
+  <div v-if="!isDataNull">
+  <!--<div>-->
       <!--data:{{data.config}} <br>-->
       <!--models:{{models}} <br>-->
       <!--rules:{{rules}} <br>-->
@@ -238,7 +238,32 @@ export default {
                 };
                 this.rules[genList[i].model].push({ validator: validatePass, trigger: 'blur' })
             }
-
+            if(dataType =='integer' || dataType =='float'){
+                var validatePass = (rule, value, callback) => {
+                    setTimeout(()=>{
+                        if (value && genList[i].options.integerbits) {
+                            if((value+"").indexOf(".") > -1){
+                                const temp = (value+"").split(".")
+                                if((temp[0]+"").length > genList[i].options.integerbits){
+                                    callback(new Error('超过整数位位数'));
+                                }
+                                if(genList[i].options.decimalbits && (temp[1]+"").length > genList[i].options.decimalbits){
+                                    callback(new Error('超过小数位位数'));
+                                }else{
+                                    callback();
+                                }
+                            }else{
+                                if((value+"").length > genList[i].options.integerbits){
+                                    callback(new Error('超过整数位位数'));
+                                }else{
+                                    callback();
+                                }
+                            }
+                        }
+                    },200)
+                };
+                this.rules[genList[i].model].push({ validator: validatePass, trigger: 'blur' })
+            }
         }
       }
     },

@@ -50,6 +50,21 @@ export const bankingComponents = [
         }
     },
     {
+        type: 'input',
+        icon: 'icon-input',
+        options: {
+            hidden: false,
+            width: '100%',
+            defaultValue: '',
+            required: false,
+            dataType: 'integer',
+            pattern: '',
+            placeholder: '',
+            disabled: false,
+            tips:"暂无提示信息"
+        }
+    },
+    {
         type: 'textarea',
         icon: 'icon-diy-com-textarea',
         options: {
