@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<input type="text" id="inputs">
+<script src="jquery.min.js"></script>
+<script src="amtUtil2.js"></script>
+<script>
+  var ins
+  $(function () {
+    var ele = document.getElementById('inputs')
+    $("#inputs").on('keydown',function () {
+      var _this = $(this)
+
+      // ele.amtFlag = 0
+      // ele.amtNum = 0
+      ele.maxLength = 10
+      // ele._dot = 2
+      InputMoney(ele)
+    })
+  })
+
+  var ob = {
+    name:'lisi',
+    value:'12345.99',
+    _dot:2,
+  }
+  // ins =  new crtAmtFormatDot(obj)
+  // console.log('ins',ins)
+
+  // formatAction = 2
+  // var amt = new AmtControl();
+  // amt.getAmtFormatDot(ob);
+  // amt.getOutputFormat(ob);
+  //
+  // console.log('ob',ob)
+
+</script>
+
+</body>
+</html>
