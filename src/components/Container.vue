@@ -184,7 +184,7 @@
           width="800px"
           form
         >
-          <codemirror v-model="code" :options="cmOptions"></codemirror>
+          <codemirror ref="myCm" v-model="code" :options="cmOptions"></codemirror>
 
         </cus-dialog>
       </el-container>
@@ -263,9 +263,17 @@ export default {
       code: '',
       cmOptions:{
         tabSize: 4,
-        mode: 'text/javascript',
-        theme: 'base16-dark',
+        mode: 'javascript',
+        theme: 'monokai',
         lineNumbers: true,
+        smartIndent: true,
+        autofocus: true,
+        styleActiveLine:true,
+        scrollbarStyle:"overlay",
+        lineWrapping: true,
+        spellcheck: true,
+        autocorrect: true,
+        indentUnit: 2,
         line: true,
       },
       mirrorVisible: false,
@@ -330,6 +338,11 @@ export default {
       codeActiveName: 'vue',
     }
   },
+  computed:{
+    codemirror() {
+      return this.$refs.myCm.codemirror
+    }
+  },
   mounted () {
     this._loadComponents()
   },
@@ -379,20 +392,20 @@ export default {
     // 获取mirror输入的代码
     getCode(){
       console.log(this.nowEle)
-      if(this.modify=="点击编写隐藏条件"){
+      if(this.modify=="隐藏条件"){
         this.nowEle.hidden = this.code;
-      }else if (this.modify=="点击编写离开条件"){
+      }else if (this.modify=="离开条件"){
         this.nowEle.condition = this.code;
-      }else if (this.modify=="点击编写赋值操作"){
+      }else if (this.modify=="离开赋值"){
         this.nowEle.assignment = this.code;
-      }else if(this.modify=="点击配置外部条件访问"){
+      }else if(this.modify=="添加校验数据"){
         let tmp;
         try {
           tmp = eval("("+this.code+")")()
         } catch (error) {
           throw new Error(error)
         }
-        this.nowEle.remoteFactor = tmp;
+        this.nowEle.remoteFactor.data = this.code;
       }
       this.mirrorVisible = false
     },

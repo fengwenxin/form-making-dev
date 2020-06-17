@@ -98,7 +98,7 @@ export default {
         hidden: '隐藏条件',     //新增隐藏条件
         valueRange: '取值范围', //新增取值范围
         showTips: '提示信息',       //新增是否显示提示信息
-        remoteFactor: '访问外部条件', //新增控件访问外部条件
+        remoteFactor: '是否需要远程校验', //新增控件访问外部条件
         title: '字段属性',
         model: '字段标识',
         name: '标题',
@@ -189,7 +189,7 @@ export default {
         attribute: '操作属性',
         dataBind: '数据绑定',
         readonly: '完全只读',
-        disabled: '禁用',
+        disabled: '只读',
         editable: '文本框可输入',
         clearable: '显示清除按钮',
         arrowControl: '使用箭头进行时间选择',

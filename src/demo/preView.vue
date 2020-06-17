@@ -5,16 +5,13 @@
       :configdata="configdata"
       ref="renderForm"
     ></render-form>
+    <el-button @click="acceptFormData">获取数据</el-button>
   </div>
 </template>
 
 <script>
-import renderForm from "../components/renderForm.vue";
 import request from "../util/request.js";
 export default {
-  components: {
-    renderForm,
-  },
   data() {
     return {
       configdata: null,
@@ -34,6 +31,10 @@ export default {
           console.log(error);
         });
     },
+    // 接收renderform组件返回的表单数据
+    acceptFormData(){
+      this.$refs.renderForm.getFormData().then(data=>{console.log(data)});
+    }
   },
 };
 </script>

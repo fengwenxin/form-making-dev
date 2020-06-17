@@ -1,10 +1,11 @@
 <template>
   <div v-if="!isDataNull">
-  <!--<div>-->
-      <!--data:{{data.config}} <br>-->
-      <!--models:{{models}} <br>-->
-      <!--rules:{{rules}} <br>-->
-    <el-form v-if="keysLength"
+    <!--<div>-->
+    <!--data:{{data.config}} <br>-->
+    <!--models:{{models}} <br>-->
+    <!--rules:{{rules}} <br>-->
+    <el-form
+      v-if="keysLength"
       ref="generateForm"
       label-suffix=":"
       :size="data.config.size"
@@ -94,9 +95,9 @@ export default {
   props: ["data", "remote", "value", "insite", "dyData"],
   computed: {
     keysLength() {
-        // 解除报错
-        return Object.keys(this.data).length
-    }
+      // 解除报错
+      return Object.keys(this.data).length;
+    },
   },
   data() {
     return {
@@ -115,10 +116,10 @@ export default {
   // created(){
   //   this.generateModle(this.data.list)
   // },
-  created () {
-      this.generateModle(this.data.list)
+  created() {
+    this.generateModle(this.data.list);
   },
-  mounted(){
+  mounted() {
     // 这个定时器主要是解决父组件异步传值，子组件生命周期获取不到数据的问题
     this.intervalId = setInterval(() => {
       if (!this.isDataNull) {
@@ -154,7 +155,10 @@ export default {
       var platform = this.dyData.platform;
       var user = this.dyData.user;
       for (let key in this.value) {
-        if (this.value[key].indexOf("platform")!=-1 || this.value[key].indexOf("user")!=-1) {
+        if (
+          this.value[key].indexOf("platform") != -1 ||
+          this.value[key].indexOf("user") != -1
+        ) {
           try {
             var tempJson = eval(this.value[key]);
           } catch (error) {
@@ -168,13 +172,12 @@ export default {
     },
     // 生成models、rules对象
     generateModle(genList) {
-
-        if(!genList){
-            return
-        }
-        console.log("========generateModle=========")
+      if (!genList) {
+        return;
+      }
+      console.log("========generateModle=========");
       for (let i = 0; i < genList.length; i++) {
-          this.dyData && Object.keys(this.dyData) &&  this.dynamicData(genList[i]);
+        this.dyData && Object.keys(this.dyData) && this.dynamicData(genList[i]);
         if (genList[i].type === "grid") {
           genList[i].columns.forEach((item) => {
             this.generateModle(item.list);
@@ -240,56 +243,67 @@ export default {
             ];
           }
 
-            // 确认密码的校验
-            // console.log('genList[i]',genList[i])
-            const dataType = genList[i].options.dataType;
-            const confirm_field = genList[i].options.confirm_field;
-            if(dataType =='againpassword'){
-                var validatePass = (rule, value, callback) => {
-                    // console.log('this.models',JSON.stringify(_this.models));
-                    setTimeout(()=>{
-                        if(this.models[confirm_field]){
-                            if (value === '') {
-                                callback(new Error('请输入确认密码'));
-                            } else if (this.models[confirm_field] !== value ) {
-                                callback(new Error('两次输入密码不一致!'));
-                            } else {
-                                callback();
-                            }
-                        }
-                    },200)
-                };
-                this.rules[genList[i].model].push({ validator: validatePass, trigger: 'blur' })
-            }
-            if(dataType =='integer' || dataType =='float'){
-                var validatePass = (rule, value, callback) => {
-                    setTimeout(()=>{
-                        if (value && genList[i].options.integerbits) {
-                            if((value+"").indexOf(".") > -1){
-                                const temp = (value+"").split(".")
-                                if((temp[0]+"").length > genList[i].options.integerbits){
-                                    callback(new Error('超过整数位位数'));
-                                }
-                                if(genList[i].options.decimalbits && (temp[1]+"").length > genList[i].options.decimalbits){
-                                    callback(new Error('超过小数位位数'));
-                                }else{
-                                    callback();
-                                }
-                            }else{
-                                if((value+"").length > genList[i].options.integerbits){
-                                    callback(new Error('超过整数位位数'));
-                                }else{
-                                    callback();
-                                }
-                            }
-                        }
-                    },200)
-                };
-                this.rules[genList[i].model].push({ validator: validatePass, trigger: 'blur' })
-            }
+          // 确认密码的校验
+          // console.log('genList[i]',genList[i])
+          const dataType = genList[i].options.dataType;
+          const confirm_field = genList[i].options.confirm_field;
+          if (dataType == "againpassword") {
+            var validatePass = (rule, value, callback) => {
+              // console.log('this.models',JSON.stringify(_this.models));
+              setTimeout(() => {
+                if (this.models[confirm_field]) {
+                  if (value === "") {
+                    callback(new Error("请输入确认密码"));
+                  } else if (this.models[confirm_field] !== value) {
+                    callback(new Error("两次输入密码不一致!"));
+                  } else {
+                    callback();
+                  }
+                }
+              }, 200);
+            };
+            this.rules[genList[i].model].push({
+              validator: validatePass,
+              trigger: "blur",
+            });
+          }
+          if (dataType == "integer" || dataType == "float") {
+            var validatePass = (rule, value, callback) => {
+              setTimeout(() => {
+                if (value && genList[i].options.integerbits) {
+                  if ((value + "").indexOf(".") > -1) {
+                    const temp = (value + "").split(".");
+                    if (
+                      (temp[0] + "").length > genList[i].options.integerbits
+                    ) {
+                      callback(new Error("超过整数位位数"));
+                    }
+                    if (
+                      genList[i].options.decimalbits &&
+                      (temp[1] + "").length > genList[i].options.decimalbits
+                    ) {
+                      callback(new Error("超过小数位位数"));
+                    } else {
+                      callback();
+                    }
+                  } else {
+                    if ((value + "").length > genList[i].options.integerbits) {
+                      callback(new Error("超过整数位位数"));
+                    } else {
+                      callback();
+                    }
+                  }
+                }
+              }, 200);
+            };
+            this.rules[genList[i].model].push({
+              validator: validatePass,
+              trigger: "blur",
+            });
+          }
         }
       }
-      this.handelDynamicInFlow()
+      this.handelDynamicInFlow();
     },
     // 验证并获取输入框当前的值
     getData() {
@@ -365,21 +379,13 @@ export default {
             console.log("handelHide");
             this.haveHide = true;
             this.data.list[i].options.hidden = true;
+          } else {
+            this.haveHide = false;
+            this.data.list[i].options.hidden = false;
           }
         }
       }
       this.getFocusEle();
-    },
-    // 离开条件检测
-    handelCondition() {
-      let condition = this.evalWrap(this.data.list[this.focusIndex].condition);
-      console.log(this.data.list[this.focusIndex].condition);
-      if (condition) {
-        this.handelElement();
-        this.handelFocus();
-      } else {
-        this.handelValidate("error", "不满足离开条件");
-      }
     },
     // 手动触发校验提示函数
     handelValidate(statu, msg) {
@@ -390,9 +396,34 @@ export default {
         ].validateMessage = msg;
       }
     },
+    // 离开条件检测
+    handelCondition() {
+      if (
+        this.data.list[this.focusIndex].condition &&
+        this.data.list[this.focusIndex].condition != ""
+      ) {
+        let condition = this.evalWrap(
+          this.data.list[this.focusIndex].condition
+        );
+        console.log(this.data.list[this.focusIndex].condition);
+        if (condition) {
+          this.handelValidate("success");
+          return true;
+          // this.handelElement();
+          // this.handelFocus();
+        } else {
+          this.handelValidate("error", "不满足离开条件");
+          return false;
+        }
+      }
+    },
+    
     // 离开赋值
     handelAssignment() {
-      this.evalWrap(this.data.list[this.focusIndex].assignment);
+      if(this.data.list[this.focusIndex].assignment && this.data.list[this.focusIndex].assignment !=""){
+        this.evalWrap(this.data.list[this.focusIndex].assignment);
+      }
+      return true
     },
     // 取值范围校验
     handelRange() {
@@ -413,26 +444,42 @@ export default {
         console.log(result);
         if (resultType == "[object Array]") {
           if (result.indexOf(nowValue) == -1) {
-            console.log("不符合取值范围");
+            this.handelValidate("error", "不在取值范围内");
             return false;
           } else {
+            this.handelValidate("success");
             return true;
           }
         } else if (resultType == "[object RegExp]") {
-          result.test(nowValue);
+          if(result.test(nowValue)){
+            this.handelValidate("success");
+            return true
+          }else{
+            this.handelValidate("error", "不在取值范围内");
+            return false
+          }
         } else if (resultType == "[object String]") {
           let resultReg = new RegExp(result);
-          resultReg.test(nowValue);
+          if(resultReg.test(nowValue)){
+            this.handelValidate("success");
+            return true
+          }else{
+            this.handelValidate("error", "不在取值范围内");
+            return false
+          }
         }
       } else {
+        this.handelValidate("success");
         return true;
       }
     },
     // 访问外部条件
     remoteValidate() {
-      if (this.data.list[this.focusIndex].remoteFactor != undefined) {
+      if (this.data.list[this.focusIndex].remoteFactor.isRemote == true) {
         let url = this.data.list[this.focusIndex].remoteFactor.url;
-        let data = this.data.list[this.focusIndex].remoteFactor.data;
+        let nowModel = this.data.list[this.focusIndex].model;
+        let data = this.models[nowModel];
+        console.log(nowModel, data);
         let success = this.data.list[this.focusIndex].remoteFactor.success;
         request
           .post(url, {
@@ -451,13 +498,20 @@ export default {
               }
               this.evalWrap(success);
               this.handelValidate("success");
+              return true;
             } else {
-              this.handelValidate("error", "验证不通过，请重新验证");
+              this.handelValidate("error", "验证失败，请重新验证");
+              return false;
             }
           })
           .catch((error) => {
             console.log(error);
+            this.handelValidate("error", "验证失败，请重新验证");
+            return false;
           });
+      } else {
+        this.handelValidate("success");
+        return true;
       }
     },
     // 全部可聚焦input节点下标加入一个全局数组维护
@@ -507,53 +561,16 @@ export default {
         }
         this.startIndex = i + 1;
         this.focusIndex = this.canFocusInputArr[i];
-        console.log('this.focusIndex',this.focusIndex);
+        console.log("this.focusIndex", this.focusIndex);
         break;
       }
     },
     // 监听input组件发射的el-change事件
     onElChange(e) {
       this.getData().then((resolve) => {
-        if (!this.handelRange()) {
-          // 主动触发错误提示
-          this.handelValidate("error", "不符合取值范围");
-          return false;
-        } else {
-          this.handelValidate("success");
-        }
-        this.remoteValidate();
-        // 无赋值条件和离开条件
-        if (
-          !this.data.list[this.focusIndex].assignment &&
-          !this.data.list[this.focusIndex].condition
-        ) {
-          console.log("none");
+        if(this.handelRange() && this.remoteValidate() && this.handelAssignment() &&this.handelCondition()){
           this.handelElement();
           this.handelFocus();
-        } else if (
-          // 有赋值无离开条件
-          this.data.list[this.focusIndex].assignment &&
-          !this.data.list[this.focusIndex].condition
-        ) {
-          console.log("assignment");
-          this.handelAssignment();
-          this.handelElement();
-          this.handelFocus();
-        } else if (
-          this.data.list[this.focusIndex].condition != "" &&
-          !this.data.list[this.focusIndex].assignment
-        ) {
-          // 有离开条件无赋值条件
-          console.log("condition");
-          this.handelCondition();
-        } else if (
-          this.data.list[this.focusIndex].assignment &&
-          this.data.list[this.focusIndex].condition
-        ) {
-          // 既有离开条件又有离开赋值
-          console.log("all");
-          this.handelAssignment();
-          this.handelCondition();
         }
       });
       this.$emit("input-enter");

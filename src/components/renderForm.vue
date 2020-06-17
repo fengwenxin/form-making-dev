@@ -1,6 +1,11 @@
 <template>
   <div class="form-wrap" ref="renderForm" :configdata="{}">
-    <fm-generate-form :data="jsonData" :value="formdata" :dyData="dyData" ref="generateForm"></fm-generate-form>
+    <fm-generate-form
+      :data="jsonData"
+      :value="formdata"
+      :dyData="dyData"
+      ref="generateForm"
+    ></fm-generate-form>
   </div>
 </template>
 
@@ -8,10 +13,10 @@
 // input_config对应的函数值
 function input_config_EE() {
   return {
-    amount: '流控数据',
-    transferType: 'platform.transferType',
-    user: '622002'
-  }
+    amount: "流控数据",
+    transferType: "platform.transferType",
+    user: "622002",
+  };
 }
 import fmGenerateForm from "./GenerateForm";
 import request from "../util/request.js";
@@ -23,16 +28,16 @@ export default {
   props: {
     configdata: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     return {
       jsonData: {},
       formdata: {
-        sex: "man"
+        sex: "man",
       },
-      dyData: {}  //流控引擎传入的数据
+      dyData: {}, //流控引擎传入的数据
     };
   },
   created() {
@@ -40,66 +45,69 @@ export default {
     // this.setDynamicData()
     // this.getInputData()
 
-      // 1
-      this.getConfigData(this.configdata).then(response => {
-          this.jsonData = response;
-      }).catch(error => {
-          console.log(error);
+    // 1
+    this.getConfigData(this.configdata)
+      .then((response) => {
+        this.jsonData = response;
       })
-      // 2
-      const {platform,user} = this.setDynamicData();
-      this.dyData = {
-          platform,
-          user
-      }
-      // 3
-      this.formdata = this.getInputData();
-
+      .catch((error) => {
+        console.log(error);
+      });
+    // 2
+    const { platform, user } = this.setDynamicData();
+    this.dyData = {
+      platform,
+      user,
+    };
+    // 3
+    this.formdata = this.getInputData();
   },
   methods: {
     // 获取表单配置信息
-      getConfigData(configdata) {
-      if(configdata.list[0].input_config_code){
+    getConfigData(configdata) {
+      if (configdata.list[0].input_config_code) {
         let codeId = configdata.list[0].input_config_code;
-        return request
-        .get("http://localhost:3000/from",{
-          params:{
-            id: codeId
-          }
-        })
+        return request.get("http://localhost:3000/from", {
+          params: {
+            id: codeId,
+          },
+        });
         /*.then(response => {
           this.jsonData = response;
         })
         .catch(error => {
           console.log(error);
         });*/
-      }else{
-        return false
+      } else {
+        return false;
       }
     },
     // 将流控引擎input数据绑定到value
-    getInputData(){
+    getInputData() {
       try {
-        let transObj = eval("("+this.configdata.list[0].input_config+")")()  //封装
+        let transObj = eval("(" + this.configdata.list[0].input_config + ")")(); //封装
         // this.formdata = transObj
-         return transObj;
+        return transObj;
       } catch (error) {
-        throw new Error("input_config解析出错")
+        throw new Error("input_config解析出错");
       }
-
     },
     // 动态数据获取
-    setDynamicData(){
+    setDynamicData() {
       // this.dyData.platform = this.configdata.platform
       // this.dyData.user = this.configdata.user
-        const platform = this.configdata.platform;
-        const user = this.configdata.user;
-        return {
-            platform,
-            user
-        }
+      const platform = this.configdata.platform;
+      const user = this.configdata.user;
+      return {
+        platform,
+        user,
+      };
     },
-  }
+    // 返回form表单键值对数据
+    getFormData() {
+      return this.$children[0].getData()
+    },
+  },
 };
 </script>
 

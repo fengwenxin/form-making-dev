@@ -56,23 +56,31 @@
       </el-form-item>
       <!-- 是否隐藏 -->
       <el-form-item :label="$t('fm.config.widget.hidden')" v-if="data.type!='grid'">
-        <el-button @click="handelMirror">点击编写隐藏条件</el-button>
-        <!-- <el-input type="textarea" v-model="data.hidden"></el-input> -->
+        <el-input style="text-overflow: ellipsis;" readonly  @focus="handelMirror" v-model="data.hidden" placeholder="隐藏条件">
+        </el-input>
       </el-form-item>
       <!-- 离开条件 -->
       <el-form-item :label="$t('fm.config.widget.condition')" v-if="data.type!='grid'">
-        <el-button @click="handelMirror">点击编写离开条件</el-button>
+        <el-input style="text-overflow: ellipsis;" readonly  @focus="handelMirror" v-model="data.condition" placeholder="离开条件">
+        </el-input>
       </el-form-item>
-      <!-- <el-form-item :label="$t('fm.config.widget.outTips')" v-if="data.type!='grid'">
-        <el-input v-model="data.outTips" placeholder="请输入离开错误提示信息"></el-input>
-      </el-form-item> -->
       <!-- 离开赋值 -->
       <el-form-item :label="$t('fm.config.widget.assignment')" v-if="data.type!='grid'">
-        <el-button @click="handelMirror">点击编写赋值操作</el-button>
+        <el-input style="text-overflow: ellipsis;" readonly  @focus="handelMirror" v-model="data.assignment" placeholder="离开赋值">
+        </el-input>
       </el-form-item>
       <!-- 访问外部条件 -->
       <el-form-item :label="$t('fm.config.widget.remoteFactor')" v-if="data.type!='grid'">
-        <el-button @click="handelMirror">点击配置外部条件访问</el-button>
+        <el-checkbox v-model="data.remoteFactor.isRemote" label="是" style="margin-bottom:10px"></el-checkbox>
+        <!-- <el-button @click="handelMirror">点击配置外部条件访问</el-button> -->
+        <template v-if="data.remoteFactor.isRemote">
+          <el-input v-model="data.remoteFactor.url" placeholder="添加校验地址" style="margin-bottom:15px">
+            <template slot="prepend">URL</template>
+          </el-input>
+          <el-input style="text-overflow: ellipsis;" readonly  @focus="handelMirror" v-model="data.remoteFactor.data" placeholder="添加校验数据">
+            <template slot="prepend">DATA</template>
+          </el-input>
+        </template>
       </el-form-item>
       <!-- 取值范围 -->
       <el-form-item :label="$t('fm.config.widget.valueRange')" v-if="data.type!='grid'">
@@ -465,7 +473,8 @@ export default {
   methods: {
     // codeMirror弹出函数
     handelMirror(e){
-      this.$emit("mirror", this.data,e.target.innerText)
+      console.log(this.data)
+      this.$emit("mirror", this.data,e.target.placeholder)
     },
     handleOptionsRemove (index) {
       if (this.data.type === 'grid') {
