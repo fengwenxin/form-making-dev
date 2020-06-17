@@ -140,6 +140,29 @@
       ></el-input-number>
     </template>
 
+    <!--标签组件-->
+    <template v-if="widget.type == 'taglable'">
+      <el-tag
+              :key="tag"
+              v-for="tag in dynamicTags"
+              closable
+              :disable-transitions="false"
+              @close="handleClose(tag)">
+        {{tag}}
+      </el-tag>
+      <el-input
+              class="input-new-tag"
+              v-if="inputVisible"
+              v-model="inputValue"
+              ref="saveTagInput"
+              size="small"
+              @keyup.enter.native="handleInputConfirm"
+              @blur="handleInputConfirm"
+      >
+      </el-input>
+      <el-button v-else class="button-new-tag" size="small" @click="showInput">+ New Tag</el-button>
+    </template>
+
     <template v-if="widget.type == 'radio'">
       <el-radio-group
               @click.native="radioFun"
@@ -349,7 +372,7 @@ export default {
   },
   data() {
     return {
-        radioVisible:false,
+      radioVisible:false,
       amountvisible:false, // 控制金额放大镜的显隐
       dataModel: this.models[this.widget.model],   // 当前组件的默认值，是双向绑定的
         pickerOptionsDate: {
@@ -404,9 +427,17 @@ export default {
                 }
             }]
         },
+        dynamicTags: ['标签一', '标签二', '标签三'],
+        inputVisible: false,
+        inputValue: ''
     };
   },
   created() {
+    if(this.widget.type == 'taglable'){
+        this.$nextTick(_ => {
+            this.dataModel = this.dynamicTags
+        })
+    }
     if (
       // 如果获取远程数据属性为真且指定了获取数据的回调函数
       this.widget.options.remote &&
@@ -431,6 +462,28 @@ export default {
     }
   },
   methods: {
+      handleClose(tag) {
+          this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
+          this.dataModel = this.dynamicTags
+      },
+
+      showInput() {
+          this.inputVisible = true;
+          this.$nextTick(_ => {
+              this.$refs.saveTagInput.$refs.input.focus();
+          });
+      },
+
+      handleInputConfirm() {
+          let inputValue = this.inputValue;
+          if (inputValue) {
+              this.dynamicTags.push(inputValue);
+          }
+          this.inputVisible = false;
+          this.inputValue = '';
+          this.dataModel = this.dynamicTags
+      },
+
       radioVisibleFun(){
           //console.log("111-------------------")
           this.radioVisible = false
@@ -587,5 +640,21 @@ export default {
     }
     .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
         opacity: 0;
+    }
+
+    .el-tag + .el-tag {
+      margin-left: 10px;
+    }
+    .button-new-tag {
+      margin-left: 10px;
+      height: 32px;
+      line-height: 30px;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+    .input-new-tag {
+      width: 90px;
+      margin-left: 10px;
+      vertical-align: bottom;
     }
 </style>

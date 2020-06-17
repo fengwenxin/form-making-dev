@@ -15,6 +15,7 @@ export default {
           checkbox: '多选框',
           idencard: '身份证',
           readcard: '读卡',
+          taglable: '标签',
       },
       fields: {
         hrinput: "华软input",

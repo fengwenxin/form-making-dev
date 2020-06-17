@@ -96,6 +96,10 @@
           ></el-input-number>
         </template>
 
+        <template v-if="element.type == 'taglable'">
+          <el-button class="button-new-tag" >+ New Tag</el-button>
+        </template>
+
         <template v-if="element.type == 'radio'">
           <el-radio-group v-model="element.options.defaultValue"
             :style="{width: element.options.width}"
