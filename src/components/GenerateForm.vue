@@ -81,6 +81,8 @@
 import GenetateFormItem from "./GenerateFormItem";
 import { loadJs } from "../util/index.js";
 import request from "../util/request.js";
+import {IdentityCodeValid} from '../util/idencardUtil';
+
 export default {
   name: "fm-generate-form",
   components: {
@@ -243,64 +245,81 @@ export default {
             ];
           }
 
-          // 确认密码的校验
-          // console.log('genList[i]',genList[i])
-          const dataType = genList[i].options.dataType;
-          const confirm_field = genList[i].options.confirm_field;
-          if (dataType == "againpassword") {
-            var validatePass = (rule, value, callback) => {
-              // console.log('this.models',JSON.stringify(_this.models));
-              setTimeout(() => {
-                if (this.models[confirm_field]) {
-                  if (value === "") {
-                    callback(new Error("请输入确认密码"));
-                  } else if (this.models[confirm_field] !== value) {
-                    callback(new Error("两次输入密码不一致!"));
-                  } else {
-                    callback();
-                  }
-                }
-              }, 200);
-            };
-            this.rules[genList[i].model].push({
-              validator: validatePass,
-              trigger: "blur",
-            });
-          }
-          if (dataType == "integer" || dataType == "float") {
-            var validatePass = (rule, value, callback) => {
-              setTimeout(() => {
-                if (value && genList[i].options.integerbits) {
-                  if ((value + "").indexOf(".") > -1) {
-                    const temp = (value + "").split(".");
-                    if (
-                      (temp[0] + "").length > genList[i].options.integerbits
-                    ) {
-                      callback(new Error("超过整数位位数"));
-                    }
-                    if (
-                      genList[i].options.decimalbits &&
-                      (temp[1] + "").length > genList[i].options.decimalbits
-                    ) {
-                      callback(new Error("超过小数位位数"));
-                    } else {
-                      callback();
-                    }
-                  } else {
-                    if ((value + "").length > genList[i].options.integerbits) {
-                      callback(new Error("超过整数位位数"));
-                    } else {
-                      callback();
-                    }
-                  }
-                }
-              }, 200);
-            };
-            this.rules[genList[i].model].push({
-              validator: validatePass,
-              trigger: "blur",
-            });
-          }
+            // 确认密码的校验
+            // console.log('genList[i]',genList[i])
+            const dataType = genList[i].options.dataType;
+            const confirm_field = genList[i].options.confirm_field;
+            if(dataType =='againpassword'){
+                var validatePass = (rule, value, callback) => {
+                    // console.log('this.models',JSON.stringify(_this.models));
+                    setTimeout(()=>{
+                        if(this.models[confirm_field]){
+                            if (value === '') {
+                                callback(new Error('请输入确认密码'));
+                            } else if (this.models[confirm_field] !== value ) {
+                                callback(new Error('两次输入密码不一致!'));
+                            } else {
+                                callback();
+                            }
+                        }
+                    },200)
+                };
+                this.rules[genList[i].model].push({ validator: validatePass, trigger: 'blur' })
+            }
+
+            if(dataType =='singletext'){
+                debugger
+                var validatePass = (rule, value, callback) => {
+                    setTimeout(()=>{
+                            if (value === '') {
+                                callback(new Error('请输入文本内容'));
+                            } else {
+                                callback();
+                            }
+                    },200)
+                };
+                this.rules[genList[i].model].push({ validator: validatePass, trigger: 'blur' })
+            }
+            //整数和数字类型     整数位、小数位位数
+            if(dataType =='integer' || dataType =='float'){
+                var validatePass = (rule, value, callback) => {
+                    setTimeout(()=>{
+                        if (value && genList[i].options.integerbits) {
+                            if((value+"").indexOf(".") > -1){
+                                const temp = (value+"").split(".")
+                                if((temp[0]+"").length > genList[i].options.integerbits){
+                                    callback(new Error('超过整数位位数'));
+                                }
+                                if(genList[i].options.decimalbits && (temp[1]+"").length > genList[i].options.decimalbits){
+                                    callback(new Error('超过小数位位数'));
+                                }else{
+                                    callback();
+                                }
+                            }else{
+                                if((value+"").length > genList[i].options.integerbits){
+                                    callback(new Error('超过整数位位数'));
+                                }else{
+                                    callback();
+                                }
+                            }
+                        }
+                    },200)
+                };
+                this.rules[genList[i].model].push({ validator: validatePass, trigger: 'blur' })
+            }
+            //身份证校验
+            if(genList[i].type =='idencard'){
+                var validatePass = (rule, value, callback) => {
+                    setTimeout(()=>{
+                        if (value && IdentityCodeValid(value)) {
+                            callback();
+                        }else{
+                            callback(new Error('身份证验证错误'));
+                        }
+                    },200)
+                };
+                this.rules[genList[i].model].push({ validator: validatePass, trigger: 'blur' })
+            }
         }
       }
       this.handelDynamicInFlow();

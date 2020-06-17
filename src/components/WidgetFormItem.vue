@@ -54,7 +54,23 @@
           ></hr-input>
         </template>
 
+        <template v-if="element.type == 'idencard' | element.type == 'readcard'">
+          <el-input
+                  v-model="element.options.defaultValue"
+                  :style="{width: element.options.width}"
+                  :placeholder="element.options.placeholder"
+                  :disabled="element.options.disabled"
+          ></el-input>
+        </template>
         <template v-if="element.type == 'input'">
+          <el-input
+            v-model="element.options.defaultValue"
+            :style="{width: element.options.width}"
+            :placeholder="element.options.placeholder"
+            :disabled="element.options.disabled"
+          ></el-input>
+        </template>
+        <template v-if="element.type == 'singletext'">
           <el-input
             v-model="element.options.defaultValue"
             :style="{width: element.options.width}"
@@ -78,6 +94,10 @@
             :controls-position="element.options.controlsPosition"
             :style="{width: element.options.width}"
           ></el-input-number>
+        </template>
+
+        <template v-if="element.type == 'taglable'">
+          <el-button class="button-new-tag" >+ New Tag</el-button>
         </template>
 
         <template v-if="element.type == 'radio'">

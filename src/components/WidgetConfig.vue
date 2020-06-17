@@ -48,6 +48,21 @@
         <el-switch v-model="data.options.filterable"></el-switch>
       </el-form-item>
 
+      <el-form-item>
+        <!--是否支持外设-->
+        <div v-if="data.type=='idencard' | data.type == 'readcard'">
+          <el-checkbox v-model="data.options.ifperipheral">{{$t('fm.config.widget.ifperipheral')}}</el-checkbox>
+        </div>
+        <!--卡类型-->
+        <div v-if="data.type=='readcard'">
+            <el-select v-model="data.options.cardType">
+                <el-option value="01" :label="$t('fm.config.widget.iccard')"></el-option>
+                <el-option value="02" :label="$t('fm.config.widget.magnetismcard')"></el-option>
+            </el-select>
+            <label>{{$t('fm.config.widget.cardType')}}</label>
+        </div>
+      </el-form-item>
+
       <el-form-item label="$t('fm.config.widget.allowHalf')" v-if="Object.keys(data.options).indexOf('allowHalf')>=0">
         <el-switch
             v-model="data.options.allowHalf"
@@ -190,11 +205,11 @@
 
       <el-form-item>
         <!--高度自适应-->
-        <div v-if="data.type=='textarea'">
+        <div v-if="data.type=='textarea' | data.type=='singletext'">
           <el-checkbox v-model="data.options.textareaautosize">{{$t('fm.config.widget.textareaautosize')}}</el-checkbox>
         </div>
         <!--最大字数-->
-        <template v-if="data.type=='textarea' && data.options.textareaautosize==true" >
+        <template v-if="(data.type=='textarea' | data.type=='singletext') && data.options.textareaautosize==true" >
           <div style="display: inline-block;width: 49%;">
             <el-input type="number" v-model="data.options.textarealength"></el-input>
           </div>
@@ -547,7 +562,7 @@ export default {
       }
 
       // todo 排除密码和确认密码 (单独自定义校验方法)
-      if (val && val !== "password" && val !== "againpassword") {
+      if (val && val !== "password" && val !== "againpassword" && val !== "singletext") {
         this.validator.type = {type: val, message: this.data.name + this.$t('fm.config.widget.validatorType')}
       } else {
         this.validator.type = null

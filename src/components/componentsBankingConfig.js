@@ -65,6 +65,22 @@ export const bankingComponents = [
         }
     },
     {
+        type: 'singletext',
+        icon: 'icon-input',
+        options: {
+            hidden: false,
+            width: '100%',
+            defaultValue: '',
+            required: false,
+            dataType: 'text',
+            decimal: '',
+            pattern: '',
+            placeholder: '',
+            disabled: false,
+            tips:"暂无提示信息"
+        }
+    },
+    {
         type: 'textarea',
         icon: 'icon-diy-com-textarea',
         options: {
@@ -209,7 +225,54 @@ export const bankingComponents = [
             remoteFunc: ''
         }
     },
-
+    {
+        type: 'idencard',
+        icon: 'icon-input',
+        options: {
+            hidden: false,
+            width: '100%',
+            defaultValue: '',
+            required: false,
+            ifperipheral: true,
+            dataType: 'string',
+            decimal: '',
+            pattern: '',
+            placeholder: '',
+            disabled: false,
+            tips:"暂无提示信息"
+        }
+    },
+    {
+        type: 'readcard',
+        icon: 'icon-input',
+        options: {
+            hidden: false,
+            width: '100%',
+            defaultValue: '',
+            required: false,
+            ifperipheral: true,
+            cardType: '01',
+            dataType: 'string',
+            decimal: '',
+            pattern: '',
+            placeholder: '',
+            disabled: false,
+            tips:"暂无提示信息"
+        }
+    },
+    {
+        type: 'taglable',
+        icon: 'icon-input',
+        options: {
+            hidden: false,
+            width: '100%',
+            defaultValue: '',
+            required: false,
+            placeholder: '',
+            disabled: false,
+            tips:"暂无提示信息"
+        }
+    },
 ]
 
 
