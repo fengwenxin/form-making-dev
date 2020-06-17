@@ -235,7 +235,7 @@ export const bankingComponents = [
             defaultValue: '',
             required: false,
             ifperipheral: true,
-            cardType: '02',
+            cardType: '01',
             dataType: 'string',
             decimal: '',
             pattern: '',

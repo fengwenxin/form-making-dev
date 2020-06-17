@@ -460,12 +460,34 @@ export default {
     },
       //身份证
     async indentcart() {
-        this.dataModel = "";
-        const idenTemp = await smartClient.allDevice('GNQ_04','')
+        var paraObj = {};
+        if(this.widget.type == "idencard"){
+            paraObj.para1 = 'GNQ_04'
+            paraObj.para2 = ''
+        }else if(this.widget.type == "readcard" && this.widget.options.cardType == "01"){
+            paraObj.para1 = 'GNQ_10'
+            const para2Obj = {}
+            para2Obj.tradeCode = '0101', //四位交易码
+            para2Obj.cardInfoPara = 'AA', //两位参数具体如下
+            paraObj.para2 = JSON.stringify(para2Obj)
+        }else if(this.widget.type == "readcard" && this.widget.options.cardType == "02"){
+            paraObj.para1 = 'GNQ_05'
+            paraObj.para2 = ''
+        }
+        const idenTemp = await smartClient.allDevice(paraObj.para1,paraObj.para2)
         if(idenTemp){
             const idenTempObj = JSON.parse(idenTemp);
+            //alert(idenTempObj.rCode)
             if(idenTempObj.rCode == 0){
-                this.dataModel = idenTempObj.idInfo.IDNumber
+                if(this.widget.type == "idencard"){
+                    this.dataModel = idenTempObj.idInfo.IDNumber
+                }else if(this.widget.type == "readcard" && this.widget.options.cardType == "01"){
+                    this.dataModel = idenTempObj.cardInfo.cardNO
+                }else if(this.widget.type == "readcard" && this.widget.options.cardType == "02"){
+                    this.dataModel = idenTempObj.szTrack2
+                    //todo szTrack3 暂时不知道可不可用
+                    var szTrack3  = idenTempObj.szTrack3
+                }
             }else{
                 alert("检测失败：" + idenTemp)
             }
@@ -494,6 +516,7 @@ export default {
           if (typeof refId == 'string') {
               const refsId = this.$refs[refId];
               // console.log('value',refsId.value)
+              alert("refsId.value"+refsId.value)
               this.dataModel  = refsId.value;
               this.amountvisible = !!this.dataModel;
           }
@@ -502,6 +525,7 @@ export default {
           console.log("这是一个enter键操作...")
           const refsId = this.$refs[refId];
           this.amountvisible = false;
+          alert("delcommafy(refsId.value)"+delcommafy(refsId.value))
           this.dataModel  = delcommafy(refsId.value);
       },
   },
@@ -522,6 +546,7 @@ export default {
       // 深度监听models，models修改时读取修改后的值赋值给dataModel
       deep: true,
       handler(val) {
+          alert("val[this.widget.model]"+val[this.widget.model])
         this.dataModel = val[this.widget.model];
       }
     }
