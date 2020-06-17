@@ -54,7 +54,7 @@
           ></hr-input>
         </template>
 
-        <template v-if="element.type == 'idencard'">
+        <template v-if="element.type == 'idencard' | element.type == 'readcard'">
           <el-input
                   v-model="element.options.defaultValue"
                   :style="{width: element.options.width}"

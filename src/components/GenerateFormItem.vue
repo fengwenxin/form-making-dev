@@ -80,7 +80,7 @@
     </template>
 
     <!--身份证-->
-    <template v-if="widget.type == 'idencard'">
+    <template v-if="widget.type == 'idencard' | widget.type == 'readcard'">
       <el-input
               :type="widget.options.dataType"
               v-model="dataModel"

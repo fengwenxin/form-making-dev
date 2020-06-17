@@ -218,7 +218,24 @@ export const bankingComponents = [
             defaultValue: '',
             required: false,
             ifperipheral: true,
-            onlinecheck: false,
+            dataType: 'string',
+            decimal: '',
+            pattern: '',
+            placeholder: '',
+            disabled: false,
+            tips:"暂无提示信息"
+        }
+    },
+    {
+        type: 'readcard',
+        icon: 'icon-input',
+        options: {
+            hidden: false,
+            width: '100%',
+            defaultValue: '',
+            required: false,
+            ifperipheral: true,
+            cardType: '02',
             dataType: 'string',
             decimal: '',
             pattern: '',

@@ -50,12 +50,16 @@
 
       <el-form-item>
         <!--是否支持外设-->
-        <div v-if="data.type=='idencard'">
+        <div v-if="data.type=='idencard' | data.type == 'readcard'">
           <el-checkbox v-model="data.options.ifperipheral">{{$t('fm.config.widget.ifperipheral')}}</el-checkbox>
         </div>
-        <!--是否支持外设-->
-        <div v-if="data.type=='idencard'">
-          <el-checkbox v-model="data.options.onlinecheck">{{$t('fm.config.widget.onlinecheck')}}</el-checkbox>
+        <!--卡类型-->
+        <div v-if="data.type=='readcard'">
+            <el-select v-model="data.options.cardType">
+                <el-option value="01" :label="$t('fm.config.widget.iccard')"></el-option>
+                <el-option value="02" :label="$t('fm.config.widget.magnetismcard')"></el-option>
+            </el-select>
+            <label>{{$t('fm.config.widget.cardType')}}</label>
         </div>
       </el-form-item>
 
