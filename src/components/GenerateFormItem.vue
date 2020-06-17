@@ -1,7 +1,8 @@
 <template>
   <el-form-item :label="widget.name" :prop="widget.model">
-    <!--widget: {{widget}}-->
-      <!--{{rules}}-->
+    widget: {{widget}}
+      <br/>
+      {{rules}}
       <!--金额控件-->
       <template v-if="widget.type == 'amount'">
           <!--放大镜-->
@@ -99,6 +100,20 @@
         :placeholder="widget.options.placeholder"
         :style="{width: widget.options.width}"
       ></hr-input>
+    </template>
+
+    <template v-if="widget.type == 'singletext'">
+      <el-input
+              autosize
+          :type="widget.options.dataType"
+          v-model="dataModel"
+          :disabled="widget.options.disabled"
+          :placeholder="widget.options.placeholder"
+          :style="{width: widget.options.width}"
+          :ref="widget.model"
+          :maxlength="widget.options.textarealength"
+          show-word-limit
+      ></el-input>
     </template>
     <template v-if="widget.type == 'textarea'">
       <el-input
@@ -516,7 +531,6 @@ export default {
           if (typeof refId == 'string') {
               const refsId = this.$refs[refId];
               // console.log('value',refsId.value)
-              alert("refsId.value"+refsId.value)
               this.dataModel  = refsId.value;
               this.amountvisible = !!this.dataModel;
           }
@@ -525,7 +539,6 @@ export default {
           console.log("这是一个enter键操作...")
           const refsId = this.$refs[refId];
           this.amountvisible = false;
-          alert("delcommafy(refsId.value)"+delcommafy(refsId.value))
           this.dataModel  = delcommafy(refsId.value);
       },
   },
@@ -546,7 +559,6 @@ export default {
       // 深度监听models，models修改时读取修改后的值赋值给dataModel
       deep: true,
       handler(val) {
-          alert("val[this.widget.model]"+val[this.widget.model])
         this.dataModel = val[this.widget.model];
       }
     }

@@ -263,6 +263,20 @@ export default {
                 };
                 this.rules[genList[i].model].push({ validator: validatePass, trigger: 'blur' })
             }
+
+            if(dataType =='singletext'){
+                debugger
+                var validatePass = (rule, value, callback) => {
+                    setTimeout(()=>{
+                            if (value === '') {
+                                callback(new Error('请输入文本内容'));
+                            } else {
+                                callback();
+                            }
+                    },200)
+                };
+                this.rules[genList[i].model].push({ validator: validatePass, trigger: 'blur' })
+            }
             //整数和数字类型     整数位、小数位位数
             if(dataType =='integer' || dataType =='float'){
                 var validatePass = (rule, value, callback) => {

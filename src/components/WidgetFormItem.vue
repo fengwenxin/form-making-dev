@@ -70,6 +70,14 @@
             :disabled="element.options.disabled"
           ></el-input>
         </template>
+        <template v-if="element.type == 'singletext'">
+          <el-input
+            v-model="element.options.defaultValue"
+            :style="{width: element.options.width}"
+            :placeholder="element.options.placeholder"
+            :disabled="element.options.disabled"
+          ></el-input>
+        </template>
         <template v-if="element.type == 'textarea'">
           <el-input type="textarea"
             v-model="element.options.defaultValue"

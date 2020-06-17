@@ -8,6 +8,7 @@ export default {
           input: '数字',
           date: '日期',
           time: '时间',
+          singletext: '文本',
           textarea: '多行文本',
           select: '下拉框',
           radio: '单选框',
