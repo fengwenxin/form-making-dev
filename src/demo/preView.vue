@@ -5,6 +5,8 @@
       :configdata="configdata"
       ref="renderForm"
     ></render-form>
+
+    <el-button @click="clickHandler">clicked</el-button>
   </div>
 </template>
 
@@ -34,6 +36,12 @@ export default {
           console.log(error);
         });
     },
+    clickHandler(){
+      console.log('this.$refs.renderForm',this.$refs.renderForm.getData());
+        this.$refs.renderForm.getData().then(res => {
+            console.log('res', JSON.stringify(res))
+        })
+    }
   },
 };
 </script>
