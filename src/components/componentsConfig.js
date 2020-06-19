@@ -26,7 +26,14 @@ export const basicComponents = [
       disabled: false,
       tips:""
     },
-    remoteFactor:{}
+    hidden:"",
+    condition:"",
+    assignment:"",
+    remoteFactor:{
+      isRemote: false,
+      url:"",
+      data:""
+    }
   },
   {
     type: 'textarea',
