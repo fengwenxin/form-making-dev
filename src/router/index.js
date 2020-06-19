@@ -4,6 +4,8 @@ import Router from 'vue-router'
 import Home from '../demo/Home.vue'
 import LanguageView from './LanguageView.vue'
 import preview from '../demo/preView.vue'
+import flowDemo from '../demo/flow-demo'
+import flowDemo2 from '../demo/flow-demo2'
 
 Vue.use(Router)
 
@@ -33,7 +35,17 @@ export default new Router({
           path: 'preview',
           name: 'preview',
           component: preview
-        }
+        },
+          {
+              path: 'flowDemo',
+              name: 'flowDemo',
+              component: flowDemo
+          },
+          {
+              path: 'flowDemo2',
+              name: 'flowDemo2',
+              component: flowDemo2
+          }
       ]
     }
   ]
