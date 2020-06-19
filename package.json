@@ -1,8 +1,8 @@
 {
-  "name": "hr-form-render",
+  "name": "form-making-dev",
   "description": "A designer and generator of form base on Vue.js, make form development simple and efficient.",
-  "version": "2.1.5",
-  "author": "GavinZhulei",
+  "version": "2.1.6",
+  "author": "fengwenxin",
   "license": "LGPL",
   "keywords": [
     "component",
@@ -13,7 +13,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/GavinZhuLei/vue-form-making"
+    "url": "https://github.com/fengwenxin/form-making-dev"
   },
   "main": "dist/FormMaking.common.js",
   "scripts": {

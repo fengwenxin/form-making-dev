@@ -8,6 +8,7 @@ import renderForm from './components/renderForm.vue'
 import enUS from './lang/en-US'
 import zhCN from './lang/zh-CN'
 
+
 import './iconfont/iconfont.css'
 import './styles/cover.scss'
 import './styles/index.scss'
